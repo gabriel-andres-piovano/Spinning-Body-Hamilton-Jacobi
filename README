@@ -1,26 +1,26 @@
 We list here all the main Mathematica notebooks and packages, with a brief description. If you make use of these codes in part or in full, please acknoledge "Piovano, Pantelidou, Mac Uilliam and Witzany" arXiv:2410.05769 (https://arxiv.org/abs/2410.05769v1)
 Some notebooks also request additional citations (see the description of "TeukolskySpinFluxesHamiltonJacobi.wl")
 
-- "Spin_connection_terms_and_shift_turning_points.nb" 
+### "Spin_connection_terms_and_shift_turning_points.nb" ###
 This Mathematica notebook provides the closed form expressions for spin-conection terms, the spin shifts to the turning points, projections of the Christoffel symbols over the Marck tetrad, the components of the spin-tensor for generic orbits, and its projections over the Kinnerlsy tetrad. Additionally, it presents some comparison for the EoM in the limit of equatorial and almost equatorial orbits. PREREQUISITEs: the packages xAct and xCoba http://www.xact.es/ If you use this notebook, please ackowledge xAct http://www.xact.es/
 
-- "Shift_frequencies.nb"
+### "Shift_frequencies.nb" ###
 This Mathematica notebook presents semi-analytic expressions for the spin corrections to the Mino-time frequencies for the fixed constants of motion (FC) and fixed turning points (DH) parametrizations. These expressions are given as one-dimensional integrals of Legendre elliptic integrals. PREREQUISITEs: none.
 
-- "Corrections_orbits.nb"
+### "Corrections_orbits.nb" ###
 The Mathematica notebook presents all the algorithms to compute the spin-corrections to the orbits in the fixed turning points and fixed constants of motion parametrization. All computations with the Hamilton-Jacobi formalism are performed with Machine Precision. 
 It also compare our results with the orbits given by the code of PRD 108, 044041 (https://journals.aps.org/prd/abstract/10.1103/PhysRevD.108.044041 ) kindly provided by Viktor Skoupý. These data is the files "data_DHS_code_generic_orbit.m" and  "data_DHS_code_near_equatorial_orbit.m PREREQUISITEs: the files the files "data_DHS_code_generic_orbit.m" and  "data_DHS_code_near_equatorial_orbit.m for comparisons with the code of PRD 108, 044041
 
-- "Corrections_orbits_plots.nb"
+### "Corrections_orbits_plots.nb" ###
 Basically the same as "Corrections_orbits.nb", but without any comparisons with the code of PRD 108, 044041. All computations are performed with arbitrary precision here. It also includes the code to sample the orbits and export the corresponding data for the plots of Fig.1 to Fig.5 . These data is plotted in the Python script "plots.ipynb". PREREQUISITEs: none.
 
--"SpinOrbitsHamiltonJacobi.wl"
+### "SpinOrbitsHamiltonJacobi.wl" ###
 The package incorporate all the algorithms for the spin-orbits corrections shown in "Corrections_orbits.nb", with several optimizations. The notebook "Amplitudes_and_fluxes_corrections_v2.nb" show how to use the package. PREREQUISITEs: none.
 
--"SpinOrbitsHamiltonJacobiNoChop.wl"
+### "SpinOrbitsHamiltonJacobiNoChop.wl" ###
 Identical to the "SpinOrbitsHamiltonJacobi.wl" package, but with all the Chop[,10^-16] functions remove in the functions sampling for the Fourier series. This version is used to test the convergence of the Fourier series of the orbits, and how the maximum number of Fourier harmonics in the orbits impact the computation of the partial amplitudes.
 
-"TeukolskySpinFluxesHamiltonJacobi.wl"
+### "TeukolskySpinFluxesHamiltonJacobi.wl" ###
 The package includes all algorithms for the computation of the asymptotic partial amplitudes, fluxes and their corrections due to the secondary. It is based on the code used in Skoupý et al, PRD 108, 044041 (https://arxiv.org/abs/2303.16798 ) kindly provided by Viktor Skoupý. Our code differ from the code used in PRD 108, 044041 in the following aspects:
 - all corrections to the orbits are computed in the Hamilton-Jacobi formalism
 - the corrections to the partial amplitudes and fluxes are fully linearized in the secondary spin thanks to the code developed in PRD 104, 124019 (https://journals.aps.org/prd/abstract/10.1103/PhysRevD.104.124019 ). In other words, our code does not use finite difference methods (see Eq. 66 of PRD 108, 044041)
@@ -37,7 +37,7 @@ If you make use of "TeukolskySpinFluxesHamiltonJacobi.wl", please acknowledge
  - "Skoupý, Lukes-Gerakopoulos, Drummond, Hughes" PRD 108, 044041 (https://journals.aps.org/prd/abstract/10.1103/PhysRevD.108.044041 )
  - SpinWeightedSpheroidalHarmonics package, version 0.3.0 (https://zenodo.org/records/8091168 ) of the  BHPToolkit (https://bhptoolkit.org/ )
  
-"Amplitudes_and_fluxes_corrections.nb"
+### "Amplitudes_and_fluxes_corrections.nb" ###
  The notebook presents the computation of the spin corrections to the partial amplitudes and fluxes in the Hamilton-Jacobi formalism. Specifically, it includes:
 - examples on how to use the package SpinOrbitsHamiltonJacobi,
 - examples on how to use the package TeukolskySpinFluxesHamiltonJacobi
@@ -52,9 +52,9 @@ PREREQUISITEs: the following packages are needed
 - Teukolsky and KerrGeodesics from the BPToolkit. These package are only needed for testing, and are not required by TeukolskySpinFluxesHamiltonJacobi
 - mod_SpinWeightedSpheroidalHarmonics2 (see the description above of "TeukolskySpinFluxesHamiltonJacobi.wl" or inside "Amplitudes_and_fluxes_corrections.nb")
 If you make use of "Amplitudes_and_fluxes_corrections.nb", please acknowledge 
-- "Piovano, Pantelidou, Mac Uilliam and Witzany" arXiv:
+- "Piovano, Pantelidou, Mac Uilliam and Witzany" arXiv:2410.05769 (https://arxiv.org/abs/2410.05769v1)
 - "Piovano, Brito, Maselli, Pani" PRD 104, 124019 (https://journals.aps.org/prd/abstract/10.1103/PhysRevD.104.124019 )
 -  "Skoupý, Lukes-Gerakopoulos, Drummond, Hughes" PRD 108, 044041 (https://journals.aps.org/prd/abstract/10.1103/PhysRevD.108.044041 )
-- SpinWeightedSpheroidalHarmonics package, version 0.3.0 (https://zenodo.org/records/8091168 ) of the  BHPToolkit (https://bhptoolkit.org/ )
-- Teukolsky package, (https://zenodo.org/records/10040501) of the  BHPToolkit
-- KerrGeodesics package, (https://zenodo.org/records/8108265) of the  BHPToolkit
+- SpinWeightedSpheroidalHarmonics package, version 0.3.0 (https://zenodo.org/records/8091168 ) of the BHPToolkit (https://bhptoolkit.org/ )
+- Teukolsky package, (https://zenodo.org/records/10040501) of the BHPToolkit
+- KerrGeodesics package, (https://zenodo.org/records/8108265) of the BHPToolkit
