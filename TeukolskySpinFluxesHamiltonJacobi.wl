@@ -63,13 +63,13 @@ BeginPackage["TeukolskySpinFluxes`",
 TeukolskySpinModeCorrectionDH::usage = "TeukolskySpinModeCorrectionDH[l,m,n,k,orbitCorrection] calculates linear correction to the fluxes and amplitudes in the fixed turning points (on average) parametrization";
 
 
-TeukolskySpinModeCorrectionFC::usage = "TeukolskySpinModeCorrectionW[l,m,n,k,orbitCorrection] calculates linear correction to the fluxes and amplitudes in the fixed constants of motion parametrization";
+TeukolskySpinModeCorrectionFC::usage = "TeukolskySpinModeCorrectionFC[l,m,n,k,orbitCorrection] calculates linear correction to the fluxes and amplitudes in the fixed constants of motion parametrization";
 
 
-TeukolskySpinModeCorrectionOrtPlus::usage = "TeukolskySpinModeCorrectionOrt[l,m,n,k,orbitCorrection] calculates the corrections to amplitudes due to the orthogonal component of the secondary spin for the +1 precession mode";
+TeukolskySpinModeCorrectionOrtPlus::usage = "TeukolskySpinModeCorrectionOrtPlus[l,m,n,k,orbitCorrection] calculates the corrections to amplitudes due to the orthogonal component of the secondary spin for the +1 precession mode";
 
 
-TeukolskySpinModeCorrectionOrtMinus::usage = "TeukolskySpinModeCorrectionOrt[l,m,n,k,orbitCorrection] calculates the corrections to amplitudes due to the orthogonal component of the secondary spin for the -1 precession mode";
+TeukolskySpinModeCorrectionOrtMinus::usage = "TeukolskySpinModeCorrectionOrtMinus[l,m,n,k,orbitCorrection] calculates the corrections to amplitudes due to the orthogonal component of the secondary spin for the -1 precession mode";
 
 
 Begin["`Private`"];
