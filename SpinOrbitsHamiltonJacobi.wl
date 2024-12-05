@@ -19,16 +19,16 @@ BeginPackage["SpinningOrbit`"];
 (*PREREQUISITEs: none. The package is stand-alone.*)
 
 
-KerrSpinOrbitCorrectionDHPar::usage = "KerrSpinOrbitCorrectionDH[a, p, e, x, nmax, kmax] calculates linear corrections to the orbits in the fixed turning points on average parametrization for the parallel component of the spin";
+KerrSpinOrbitCorrectionDHPar::usage = "KerrSpinOrbitCorrectionDHPar[a, p, e, x, nmax, kmax] calculates linear corrections to the orbits in the fixed turning points on average parametrization for the parallel component of the spin";
 
 
-KerrSpinOrbitCorrectionFCPar::usage = "KerrSpinOrbitCorrectionDH[a, p, e, x, nmax, kmax] calculates linear corrections to the orbits in the fixed constants of motion parametrization for the parallel component of the spin";
+KerrSpinOrbitCorrectionFCPar::usage = "KerrSpinOrbitCorrectionFCPar[a, p, e, x, nmax, kmax] calculates linear corrections to the orbits in the fixed constants of motion parametrization for the parallel component of the spin";
 
 
-KerrSpinOrbitCorrectionDHMapFC::usage = "KerrSpinOrbitCorrection\[Eta]map[a, p, e, x, nmax, kmax] calculates the map between the fixed turning points and fixed constants of motion parametrization ";
+KerrSpinOrbitCorrectionDHMapFC::usage = "KerrSpinOrbitCorrectionDHMapFC[a, p, e, x, nmax, kmax] calculates the map between the fixed turning points and fixed constants of motion parametrization ";
 
 
-KerrSpinOrbitCorrectionOrt::usage = "KerrSpinOrbitCorrection\[Eta]map[a, p, e, x, nmax, kmax] calculates linear corrections to the orbits for the orthogonal component of the spin ";
+KerrSpinOrbitCorrectionOrt::usage = "KerrSpinOrbitCorrectionOrt[a, p, e, x, nmax, kmax] calculates linear corrections to the orbits for the orthogonal component of the spin ";
 
 
 Begin["`Private`"];
@@ -405,7 +405,7 @@ KKgfunsgn[a_,r1g_,r2g_,z1g_,sgn_]:=(Lzgfunsgn[a,r1g,r2g,z1g,sgn]-a EEgfunsgn[a,r
 (*Inversion of the integrals in A12 and A13 in Phys. Rev. D 100, 104030*)
 
 
-\[Chi]rfun[wr_,a_,p_,e_,xg_,const_]:=Module[{r1g,r2g,EEg,Lzg,KKg,r3g,r4g,krg,ellK,jSN},
+\[Chi]rfun[wr_,a_,p_,e_,xg_,const_]:=Module[{r1g,r2g,EEg,Lzg,KKg,r3g,r4g,krg,ellK,jSN,Wrg},
 	{EEg,Lzg,KKg}=const;
 	
 	r1g=p/(1-e);
@@ -416,16 +416,17 @@ KKgfunsgn[a_,r1g_,r2g_,z1g_,sgn_]:=(Lzgfunsgn[a,r1g,r2g,z1g,sgn]-a EEgfunsgn[a,r
 	krg=((r1g-r2g)(r3g-r4g))/((r1g-r3g)(r2g-r4g));
 	ellK=EllipticK[krg];
 	jSN=JacobiSN[1/\[Pi] ellK wr,krg];
+	Wrg = jSN^2/(r1g-r3g);
 	
 	If[Mod[wr,2Pi]<Pi,
-		ArcSin[2/(r1g-r2g) (r3g(r1g-r2g)jSN^2-r2g(r1g-r3g))((r1g-r2g)jSN^2-(r1g-r3g))^(-1)-(r1g+r2g)/(r1g-r2g)]+2\[Pi]*Floor[wr/(2\[Pi])]
+		ArcSin[((r1g+r2g-2r3g)Wrg-1)/(1-(r1g-r2g)Wrg)]+2\[Pi]*Floor[wr/(2\[Pi])]
 		,
-		\[Pi]-ArcSin[2/(r1g-r2g) (r3g(r1g-r2g)jSN^2-r2g(r1g-r3g))((r1g-r2g)jSN^2-(r1g-r3g))^(-1)-(r1g+r2g)/(r1g-r2g)]+2\[Pi]*Floor[wr/(2\[Pi])]
+		\[Pi]-ArcSin[((r1g+r2g-2r3g)Wrg-1)/(1-(r1g-r2g)Wrg)]+2\[Pi]*Floor[wr/(2\[Pi])]
 	 ]
 ]
 
 
-Sin\[Chi]rfun[wr_,a_,p_,e_,xg_,const_]:=Module[{r1g,r2g,EEg,Lzg,KKg,r3g,r4g,krg,ellK,jSN},
+Sin\[Chi]rfun[wr_,a_,p_,e_,xg_,const_]:=Module[{r1g,r2g,EEg,Lzg,KKg,r3g,r4g,krg,ellK,jSN,Wrg},
 	{EEg,Lzg,KKg}=const;
 	r1g=p/(1-e);
 	r2g=p/(1+e);
@@ -435,8 +436,9 @@ Sin\[Chi]rfun[wr_,a_,p_,e_,xg_,const_]:=Module[{r1g,r2g,EEg,Lzg,KKg,r3g,r4g,krg,
 	krg=((r1g-r2g)(r3g-r4g))/((r1g-r3g)(r2g-r4g));
 	ellK=EllipticK[krg];
 	jSN=JacobiSN[1/\[Pi] ellK wr,krg];
+	Wrg = jSN^2/(r1g-r3g);
 	
-	2/(r1g-r2g) (r3g(r1g-r2g)jSN^2-r2g(r1g-r3g))((r1g-r2g)jSN^2-(r1g-r3g))^(-1)-(r1g+r2g)/(r1g-r2g)
+	((r1g+r2g-2r3g)Wrg-1)/(1-(r1g-r2g)Wrg)
 ]
 
 
