@@ -377,7 +377,7 @@ TeukolskyHSCoeff1spin :=
 (*BCs at the horizon*)
 
 
-bchorHS0spin[workingprecision_,s_,m_,a_,\[Omega]0_,\[Lambda]0_]:=Module[{M=1,deltarp,An0,rp,rm,rin,err,i,chor0,p,q,phor0,qhor0,dphor0,dqhor0,\[Psi]hor0,an0,cInHor0},
+bchorHS0spin[workingprecision_,s_,m_,a_,\[Omega]0_,\[Lambda]0_]:=Module[{M=1,deltarp,An0,rp,rm,rin,err,errold,i,chor0,p,q,phor0,qhor0,dphor0,dqhor0,\[Psi]hor0,an0,cInHor0},
 	rp=M+Sqrt[M^2-a^2];
 	rm=M-Sqrt[M^2-a^2];
 	deltarp=(rp-rm)/50;
@@ -419,10 +419,18 @@ bchorHS0spin[workingprecision_,s_,m_,a_,\[Omega]0_,\[Lambda]0_]:=Module[{M=1,del
 			phor0=p[rin,-1,s,m,a,\[Omega]0,\[Lambda]0];
 			qhor0=q[rin,-1,s,m,a,\[Omega]0,\[Lambda]0];
 		];
-	        an0[i]=An0[i];
+	    an0[i]=An0[i];
 		\[Psi]hor0=Evaluate[1+Sum[an0[k](#-rp)^k,{k,i}]]&;
 		err=Abs[\[Psi]hor0''[rin]+phor0 \[Psi]hor0'[rin]+qhor0 \[Psi]hor0[rin]];
-	    i++;
+	   
+	   If[errold<=err&&errold> 10^(-workingprecision)&&i>5,
+			Break[];
+			,
+			errold=err;
+		];
+		i++;
+		
+		If[i > 100, Break[]]  (*Safeguard to avoid ruwaway computation*)  
 	];
 	
 	cInHor0=Table[an0[k],{k,0,i-1}]; (*Coefficients for ingoing waves near horizon (-)*)
