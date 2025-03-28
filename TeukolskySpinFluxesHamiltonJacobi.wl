@@ -406,6 +406,7 @@ bchorHS0spin[workingprecision_,s_,m_,a_,\[Omega]0_,\[Lambda]0_]:=Module[{M=1,del
 	An0[n_]:= -(1/(n(n-chor0)))Sum[(j*dphor0[n-j]+dqhor0[n-j])an0[j],{j,0,n-1}];
 	
 	err=1;
+	errold=1;
 	i=1;
 	{p,q}=TeukolskyHSCoeff1spin[[{1,3}]];
 	phor0=p[rin,-1,s,m,a,\[Omega]0,\[Lambda]0];
