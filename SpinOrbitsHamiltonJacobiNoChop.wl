@@ -12,7 +12,7 @@ BeginPackage["SpinningOrbit`"];
 
 
 (* ::Text:: *)
-(*IMPORTANT NOTE: the following package include all the functions to compute the spin-corrections to the orbits (trajectories and velocities), constants of motion and frequencies for the fixed turning points (or "FC") and the fixed constants of motion (or "DH") parametrizations. It includes the contributions to both the parallel and orthogonal components of the secondary spin, and the maps between the corrections to the orbits in the FC and DH parametrizations.*)
+(*IMPORTANT NOTE: the following package include all the functions to compute the spin-corrections to the orbits (trajectories and velocities), constants of motion and frequencies for the fixed turning points (or "DH") and the fixed constants of motion (or "FC") parametrizations. It includes the contributions to both the parallel and orthogonal components of the secondary spin, and the maps between the corrections to the orbits in the FC and DH parametrizations.*)
 
 
 (* ::Text:: *)
