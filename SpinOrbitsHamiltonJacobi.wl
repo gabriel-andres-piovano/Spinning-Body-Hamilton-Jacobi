@@ -5055,10 +5055,6 @@ KerrSpinOrbitCorrectionFCPar[a_, p_, e_, x_, nmax_?(IntegerQ[#] && # > 0&), kmax
 	\[CapitalUpsilon]rg=\[CapitalUpsilon]rgfun[a,p,e,x];
 	\[CapitalUpsilon]zg=\[CapitalUpsilon]zgfun[a,p,e,x];
 	\[CapitalUpsilon]\[Phi]g=\[CapitalUpsilon]\[Phi]grfun[a,p,e,x]+\[CapitalUpsilon]\[Phi]gzfun[a,p,e,x];
-	
-	(* spin correction constants of motion *)
-	{\[Delta]EEg,\[Delta]Lzg,\[Delta]KKg}=\[Delta]constmotionfun[a,p,e,x];
-	\[Delta]constmot={\[Delta]EEg,\[Delta]Lzg,\[Delta]KKg};
 	  
 	(* steps for numerical integration *)
 	stepsr=4*nmax;
@@ -5110,9 +5106,6 @@ KerrSpinOrbitCorrectionFCPar[a_, p_, e_, x_, nmax_?(IntegerQ[#] && # > 0&), kmax
 	 "Eg"->EEg,
 	 "Lzg"->Lzg,
 	 "Kg"->KKg,
-	 "Es"->\[Delta]EEg,
-	 "Jzs"->\[Delta]Lzg,
-	 "Ks"->\[Delta]KKg,
 	 "MinoFrequenciesGeo"->{\[CapitalUpsilon]tg,\[CapitalUpsilon]rg,\[CapitalUpsilon]zg,\[CapitalUpsilon]\[Phi]g},
 	 "BLFrequenciesGeo"->{\[CapitalUpsilon]rg/\[CapitalUpsilon]tg,\[CapitalUpsilon]zg/\[CapitalUpsilon]tg,\[CapitalUpsilon]\[Phi]g/\[CapitalUpsilon]tg},
 	 "MinoFrequenciesCorrection"->{\[CapitalUpsilon]ts,\[CapitalUpsilon]rs,\[CapitalUpsilon]zs,\[CapitalUpsilon]\[Phi]s},
