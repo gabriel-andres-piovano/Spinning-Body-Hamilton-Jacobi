@@ -505,7 +505,7 @@ bcinfHS0spin[workingprecision_,s_,m_,a_,\[Omega]0_,\[Lambda]0_]:=Module[{M=1,rp,
 (*Linearized BCs in the spin at the horizon*)
 
 
-bchorHS1spin[workingprecision_,s_,m_,a_,\[Omega]0_,\[Omega]1_,\[Lambda]0_,\[Lambda]1_]:=Module[{M=1,deltarp,An0,rp,rm,rin,err,i,chor0,chor1,p,q,phor0,qhor0,dphor0,dphor1,dqhor0,dqhor1,\[Psi]hor0,an0,an1,cInHor0,cInHor1},
+bchorHS1spin[workingprecision_,s_,m_,a_,\[Omega]0_,\[Omega]1_,\[Lambda]0_,\[Lambda]1_]:=Module[{M=1,deltarp,An0,rp,rm,rin,err,errold,i,chor0,chor1,p,q,phor0,qhor0,dphor0,dphor1,dqhor0,dqhor1,\[Psi]hor0,an0,an1,cInHor0,cInHor1},
 	rp=M+Sqrt[M^2-a^2];
 	rm=M-Sqrt[M^2-a^2];
 	deltarp=(rp-rm)/50;
@@ -553,6 +553,7 @@ bchorHS1spin[workingprecision_,s_,m_,a_,\[Omega]0_,\[Omega]1_,\[Lambda]0_,\[Lamb
 	An0[n_]:= -(1/(n(n-chor0)))Sum[(j*dphor0[n-j]+dqhor0[n-j])an0[j],{j,0,n-1}];
 	
 	err=1;
+	errold=1;
 	i=1;
 	{p,q}=TeukolskyHSCoeff1spin[[{1,3}]] ;
 	phor0=p[rin,-1,s,m,a,\[Omega]0,\[Lambda]0];
@@ -566,10 +567,18 @@ bchorHS1spin[workingprecision_,s_,m_,a_,\[Omega]0_,\[Omega]1_,\[Lambda]0_,\[Lamb
 			phor0=p[rin,-1,s,m,a,\[Omega]0,\[Lambda]0];
 			qhor0=q[rin,-1,s,m,a,\[Omega]0,\[Lambda]0];
 		];
-	        an0[i]=An0[i];
+	    an0[i]=An0[i];
 		\[Psi]hor0=Evaluate[1+Sum[an0[k](#-rp)^k,{k,i}]]&;
 		err=Abs[\[Psi]hor0''[rin]+phor0 \[Psi]hor0'[rin]+qhor0 \[Psi]hor0[rin]];
-	    i++;
+	   
+	   If[errold<=err&&errold> 10^(-workingprecision)&&i>5,
+			Break[];
+			,
+			errold=err;
+		];
+		i++;
+		
+		If[i > 100, Break[]]  (*Safeguard to avoid ruwaway computation*)  
 	];
 	
 	an1[0]=0;
