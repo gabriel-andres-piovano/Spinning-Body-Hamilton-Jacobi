@@ -8,7 +8,7 @@ BeginPackage["SpinningOrbit`"];
 
 
 (* ::Text:: *)
-(*If you make use of this package, please acknowledge "Piovano, Pantelidou, Mac Uilliam and Witzany" arXiv:2410.05769 (https://arxiv.org/abs/2410.05769v1 )*)
+(*If you make use of this package, please acknowledge "Piovano, Pantelidou, Mac Uilliam and Witzany" Phys. Rev. D 111, 044009 (https://journals.aps.org/prd/abstract/10.1103/PhysRevD.111.044009 )*)
 
 
 (* ::Text:: *)
@@ -16,19 +16,26 @@ BeginPackage["SpinningOrbit`"];
 
 
 (* ::Text:: *)
+(*UPDATE version 0.5.0: added the fixed eccentricity gauge (or "FE") for nearly-equatorial orbits. The initial condition radius at \[Lambda]=0 is at the geodesic apoastron (unlike for implementation of the DH and FC spin-gauges).*)
+
+
+(* ::Text:: *)
 (*PREREQUISITEs: none. The package is stand-alone.*)
 
 
-KerrSpinOrbitCorrectionDHPar::usage = "KerrSpinOrbitCorrectionDHPar[a, p, e, x, nmax, kmax] calculates linear corrections to the orbits in the fixed turning points on average parametrization for the parallel component of the spin";
+KerrSpinOrbitCorrectionDHPar::usage = "KerrSpinOrbitCorrectionDHPar[a, p, e, x, nmax, kmax] calculates the linear corrections to the orbits in the fixed turning points on average parametrization for the parallel component of the spin.";
 
 
-KerrSpinOrbitCorrectionFCPar::usage = "KerrSpinOrbitCorrectionFCPar[a, p, e, x, nmax, kmax] calculates linear corrections to the orbits in the fixed constants of motion parametrization for the parallel component of the spin";
+KerrSpinOrbitCorrectionFCPar::usage = "KerrSpinOrbitCorrectionFCPar[a, p, e, x, nmax, kmax] calculates the linear corrections to the orbits in the fixed constants of motion parametrization for the parallel component of the spin.";
 
 
-KerrSpinOrbitCorrectionDHMapFC::usage = "KerrSpinOrbitCorrectionDHMapFC[a, p, e, x, nmax, kmax] calculates the map between the fixed turning points and fixed constants of motion parametrization ";
+KerrSpinOrbitCorrectionDHMapFC::usage = "KerrSpinOrbitCorrectionDHMapFC[a, p, e, x, nmax, kmax] calculates the map between the fixed turning points and fixed constants of motion parametrization.";
 
 
-KerrSpinOrbitCorrectionOrt::usage = "KerrSpinOrbitCorrectionOrt[a, p, e, x, nmax, kmax] calculates linear corrections to the orbits for the orthogonal component of the spin ";
+KerrSpinOrbitCorrectionOrt::usage = "KerrSpinOrbitCorrectionOrt[a, p, e, x, nmax, kmax] calculates the linear corrections to the orbits for the orthogonal component of the spin.";
+
+
+KerrSpinOrbitCorrectionFEParEq::usage = "KerrSpinOrbitCorrectionFEParEq[a, p, e, x, nmax] calculates the linear corrections to the orbits in the fixed eccentricity parametrization for nearly equatorial orbits.";
 
 
 Begin["`Private`"];
@@ -97,11 +104,52 @@ Lzgfun[a_,p_,e_,xg_]:=Module[{r1g,r2g,z1g,EEg,Lzgzaux,ddinc,ffinc,gginc,hhinc},
 	
 	Lzgzaux=Sqrt[(gginc[r2g]^2+hhinc[r2g]*ffinc[r2g])EEg^2-hhinc[r2g]*ddinc[r2g]];
 	
-	(-gginc[r2g] EEg+RealSign[xg] Lzgzaux)/hhinc[r2g]
+	(-gginc[r2g]*EEg+RealSign[xg] Lzgzaux)/hhinc[r2g]
 ]
 
 
 KKgfun[a_,p_,e_,xg_]:=(Lzgfun[a,p,e,xg]-a EEgfun[a,p,e,xg])^2+(1-xg^2)(a^2(1-EEgfun[a,p,e,xg]^2)+Lzgfun[a,p,e,xg]^2/xg^2);
+
+
+EEgfuneq[a_,p_,e_,xg_]:=Sqrt[(p(-a^2(1-e^2)^2(-5+e^2+3p)+p(4e^4+(-3+p)(p-2)^2-e^2(p^2-8)))-2(1-e^2)^2 Sqrt[a^2*p(a^2(1+e)^2+p(-2-2e+p))(a^2(1-e)^2+p(-2+2e+p))]RealSign[xg])/(p^2(-4a^2(1-e^2)^2+(3+e^2-p)^2p))]
+
+
+Lzgfuneq[a_,p_,e_,xg_]:=Module[{r2g,EEg,Lzgzaux,ddinc,ffinc,gginc,hhinc},
+	r2g=p/(1+e);
+	EEg=EEgfuneq[a,p,e,xg];
+
+	ddinc[r_]:=(r^2-2r+a^2)r^2;
+	ffinc[r_]:=r^4+a^2(r+2)r;
+	gginc[r_]:=2 a r;
+	hhinc[r_]:=r(r-2);
+	Lzgzaux=Sqrt[(gginc[r2g]^2+hhinc[r2g]ffinc[r2g])EEg^2-hhinc[r2g]ddinc[r2g]];
+
+	(-gginc[r2g]*EEg+RealSign[xg]Lzgzaux)/hhinc[r2g]
+]
+
+
+dEEdpfuneq[a_,p_,e_,x_]:=Module[{EEg,auxsqr,auxden},
+	EEg=EEgfuneq[a,p,e,x];
+	auxsqr=Sqrt[p^11(a^4(1-e^2)^2+(-4e^2+(-2+p)^2)p^2+2a^2*p(-2+p+e^2(2+p)))];
+	auxden=(-4a^2(1-e^2)^2+(3+e^2-p)^2*p);
+
+	-(((-14a^2(1-e^2)^2+(12+4e^2-5p)(3+e^2-p)p)((2+2e-p)(3+e^2-p)p(-2+2e+p)-a^2(1-e^2)^2(-5+e^2+3p)))/(EEg*p^2*auxden^2))+(2(1-e^2)^2(-14a^2(1-e^2)^2+(12+4e^2-5p)(3+e^2-p)p)a*auxsqr*RealSign[x])/(EEg*p^8*auxden^2)-(a (1-e^2)^2*p^3(11a^4(1-e^2)^2+48a^2(-1+e^2)p+26(2+a^2+(-2+a^2)e^2)p^2-56p^3+15p^4)RealSign[x])/(2EEg*auxden*auxsqr)+(-3a^2(1-e^2)^2(-10+2e^2+7p)+p(28(-3+2e^2+e^4)+128p-9(7+e^2)p^2+10p^3))/(2EEg*p^2*auxden)
+]
+
+
+dLzdpfuneq[a_,p_,e_,x_]:=Module[{r2g,EEg,dEEdp,Lzgzaux,ddinc,ffinc,gginc,hhinc},
+	r2g=p/(1+e);
+	EEg=EEgfuneq[a,p,e,x];
+	dEEdp=dEEdpfuneq[a,p,e,x];
+
+	ddinc[r_]:=(r^2-2r+a^2)r^2;
+	ffinc[r_]:=r^4+a^2(r+2)r;
+	gginc[r_]:=2 a r;
+	hhinc[r_]:=r(r-2);
+	Lzgzaux=Sqrt[(gginc[r2g]^2+hhinc[r2g]ffinc[r2g])EEg^2-hhinc[r2g]ddinc[r2g]];
+
+	(-EEg*gginc[r2g]+Lzgzaux*RealSign[x])/((1+e)hhinc[r2g]^2) (2(1+e-p))/(1+e)-(gginc[r2g]*dEEdp)/hhinc[r2g]-EEg/hhinc[r2g] (2a)/(1+e)+RealSign[x]/hhinc[r2g] ((hhinc[r2g]*EEg*2ffinc[r2g]*dEEdp)/(2Lzgzaux)-hhinc[r2g] /(2Lzgzaux) (2p(a^2(1+e)^2+p(-3-3e+2p)))/(1+e)^4+(hhinc[r2g]EEg^2)/(2Lzgzaux) ((4p^3+2a^2(1+e)^2(1+e+p))/(1+e)^4)+(2EEg^2*gginc[r2g])/(2Lzgzaux) (2a)/(1+e)+(2gginc[r2g]^2EEg*dEEdp)/(2Lzgzaux)-(-ddinc[r2g]+EEg^2ffinc[r2g]) /(2Lzgzaux) (2(1+e-p))/(1+e)^2)
+]
 
 
 (* ::Subsubsection::Closed:: *)
@@ -442,6 +490,20 @@ Sin\[Chi]rfun[wr_,a_,p_,e_,xg_,const_]:=Module[{r1g,r2g,EEg,Lzg,KKg,r3g,r4g,krg,
 ]
 
 
+Sin\[Chi]rICr1gfuneq[wr_,a_,p_,e_,x_]:=Module[{r1g,r2g,EEg,Lzg,KKg,r3g,krg,ellK,jSN,Wrg},
+	EEg=EEgfun[a,p,e,x];
+	Lzg=Lzgfun[a,p,e,x];
+	r1g=p/(1-e);
+	r2g=p/(1+e);
+	r3g=2/(1-EEg^2)-(r1g+r2g);
+	krg=((r1g-r2g)(r3g))/((r1g-r3g)(r2g));
+	ellK=EllipticK[krg];
+	jSN=JacobiSN[1/\[Pi] ellK wr,krg];
+
+	(r2g-jSN^2(r1g+r2g))/(jSN^2(r1g-r2g)+r2g)
+]
+
+
 (* ::Text:: *)
 (*The \[Pi]/2 term is added to match the convention in KerrGeodesics package of the Toolkit*)
 
@@ -551,6 +613,21 @@ zgfun[wz_,a_,p_,e_,xg_,const_]:=Module[{EEg,Lzg,KKg,z1g,z2g,kzg,ellK},
 ]
 
 
+rgICr1gfuneq[wr_,a_,p_,e_,x_]:=Module[{r1g,r2g,EEg,Lzg,KKg,r3g,krg,ellK,jSN},
+	EEg=EEgfun[a,p,e,x];
+	Lzg=Lzgfun[a,p,e,x];
+
+	r1g=p/(1-e);
+	r2g=p/(1+e);
+	r3g=2/(1-EEg^2)-(r1g+r2g);
+	krg=((r1g-r2g)r3g)/((r1g-r3g)r2g);
+	ellK=EllipticK[krg];
+	jSN=JacobiSN[1/\[Pi] ellK wr,krg];
+
+	r1g*r2g/(r2g+(r1g-r2g)*jSN^2)
+]
+
+
 (* ::Subsubsection::Closed:: *)
 (*Derivatives trajectories wrt to wr and wz*)
 
@@ -566,6 +643,19 @@ drgdwrfun[wr_,a_,p_,e_,xg_,const_]:=Module[{r1g,r2g,EEg,Lzg,KKg,r3g,r4g,krg,ellK
 	jSN=JacobiSN[1/\[Pi] ellK wr,krg];
 	
 	(2 ellK (r1g-r2g) (r1g-r3g) (r2g-r3g) JacobiCN[(ellK wr)/\[Pi],krg] JacobiDN[(ellK wr)/\[Pi],krg] jSN)/(\[Pi] (-r1g+r3g+(r1g-r2g) jSN^2)^2)
+]
+
+
+drgdwrICr1gfuneq[wr_,a_,p_,e_,x_]:=Module[{r1g,r2g,EEg,Lzg,KKg,r3g,r4g,krg,ellK,jSN},
+	EEg=EEgfun[a,p,e,x];
+	Lzg=Lzgfun[a,p,e,x];
+	r1g=p/(1-e);
+	r2g=p/(1+e);
+	r3g=2/(1-EEg^2)-(r1g+r2g);
+	krg=((r1g-r2g)(r3g))/((r1g-r3g)(r2g));
+	ellK=EllipticK[krg];
+	jSN=JacobiSN[1/\[Pi] ellK*wr,krg];
+	-((2ellK*r1g(r1g-r2g)r2g*JacobiCN[(ellK*wr)/\[Pi],krg]JacobiDN[(ellK*wr)/\[Pi],krg]jSN)/(\[Pi] (r2g+(r1g-r2g)jSN^2)^2))
 ]
 
 
@@ -946,6 +1036,58 @@ d\[Phi]zgd\[Lambda][wz_,coeff_]:=Module[{dim},
 ];
 
 
+(* ::Subsection::Closed:: *)
+(*Geodesics periodic velocities, equatorial plane*)
+
+
+(* ::Subsubsection::Closed:: *)
+(*Coordinate-time geodesic velocity*)
+
+
+VtrgICr1gfuneq[wr_,a_,p_,e_,x_]:=Module[{EEg,Lzg,rg},
+	EEg=EEgfuneq[a,p,e,x];
+	Lzg=Lzgfuneq[a,p,e,x];
+	rg=rgICr1gfuneq[wr,a,p,e,x];
+
+	EEg((rg^2+a^2)^2/(rg^2-2rg+a^2))-(2a*rg)/(rg^2-2rg+a^2)Lzg-EEg*a^2
+]
+
+
+(* ::Subsubsection::Closed:: *)
+(*Azimuthal geodesic velocity*)
+
+
+V\[Phi]rgICr1gfuneq[wr_,a_,p_,e_,x_]:=Module[{EEg,Lzg,rg},
+	EEg=EEgfuneq[a,p,e,x];
+	Lzg=Lzgfuneq[a,p,e,x];
+	rg=rgICr1gfuneq[wr,a,p,e,x];
+
+	a/(rg^2-2rg+a^2)(EEg(rg^2+a^2)-a*Lzg)-a*EEg+Lzg
+]
+
+
+(* ::Subsubsection::Closed:: *)
+(*Fourier coefficients of the geodesic coordinate time and azimuthal velocities*)
+
+
+VtrgcoeffICr1geq[nmax_,a_,p_,e_,x_]:=Module[{stepsr,wrlist,Vtrglist,ExpniTable},
+	stepsr=4*nmax;
+	wrlist=Table[i,{i,2Pi/(stepsr)/2,2Pi,2Pi/(stepsr)}];
+	Vtrglist=VtrgICr1gfuneq[wrlist,a,p,e,x];
+	ExpniTable=Table[N[Exp[2Pi*I*n*(i-1/2)/stepsr],Precision[{a,p,e}]],{n,-nmax,nmax},{i,1,stepsr}];
+	Chop[(ExpniTable . Vtrglist)/stepsr,10^(-16)]
+]
+
+
+V\[Phi]rgcoeffICr1geq[nmax_,a_,p_,e_,x_]:=Module[{stepsr,wrlist,V\[Phi]rglist,ExpniTable},
+	stepsr=4*nmax;
+	wrlist=Table[i,{i,2Pi/(stepsr)/2,2Pi,2Pi/(stepsr)}];
+	V\[Phi]rglist=V\[Phi]rgICr1gfuneq[wrlist,a,p,e,x];
+	ExpniTable=Table[N[Exp[2Pi*I*n*(i-1/2)/stepsr],Precision[{a,p,e}]],{n,-nmax,nmax},{i,1,stepsr}];
+	Chop[(ExpniTable . V\[Phi]rglist)/stepsr,10^(-16)]
+]
+
+
 (* ::Section::Closed:: *)
 (*Spin coefficients and projections Marck tetrad over Christoffel symbols*)
 
@@ -1007,6 +1149,28 @@ d\[Phi]zgd\[Lambda][wz_,coeff_]:=Module[{dim},
 	vrg=Sign[Pi-Mod[wr,2Pi]]Sqrt[(r1g-rg)(rg-r2g)]Yrg;
 	
 	vrgdvrgdrg (Rrg Sqrt[KKg])/((KKg+rg^2)\[CapitalDelta]rg^2 rg)+vrg^2/(Sqrt[KKg]\[CapitalDelta]rg^2) (Rrg/rg^2-(2 Rrg)/rg^2-EEg (KKg-rg^2)/(KKg+rg^2))
+]
+
+
+\[ScriptCapitalS]12rICr1gfuneq[wr_,a_,p_,e_,x_]:=Module[{EEg,Lzg,KKg,r1g,r2g,r3g,rg,\[CapitalDelta]rg,Rrg,Yrg,vrgdvrgdrg,vrg},
+	EEg=EEgfun[a,p,e,x];
+	Lzg=Lzgfun[a,p,e,x];
+	KKg=(Lzg-a EEg)^2;
+	
+	r1g=p/(1-e);
+	r2g=p/(1+e);
+	r3g=2/(1-EEg^2)-(r1g+r2g);
+	
+	rg=rgICr1gfuneq[wr,a,p,e,x];
+	
+	\[CapitalDelta]rg=(a^2-2rg+rg^2);
+	Rrg=(-a*Lzg+EEg(a^2+rg^2));
+	Yrg=Sqrt[(1-EEg^2)(rg-r3g)rg];
+	
+	vrgdvrgdrg=(2rg*EEg*Rrg-rg*\[CapitalDelta]rg-(rg-1)(KKg+rg^2));
+	vrg=Sign[Pi-Mod[wr,2Pi]]Sqrt[(r1g-rg)(rg-r2g)]Yrg;
+	
+	vrgdvrgdrg (Rrg*Sqrt[KKg])/((KKg+rg^2)\[CapitalDelta]rg^2*rg)+vrg^2/(Sqrt[KKg]\[CapitalDelta]rg^2)(Rrg/rg^2-(2Rrg)/rg^2-EEg (KKg-rg^2)/(KKg+rg^2))
 ]
 
 
@@ -1326,6 +1490,29 @@ d\[Phi]zgd\[Lambda][wz_,coeff_]:=Module[{dim},
 ]
 
 
+\[CapitalGamma]t12ICr1gfuneq[wr_,a_,p_,e_,x_]:=Module[{EEg,Lzg,KKg,r1g,r2g,r3g,rg,\[CapitalDelta]rg,Rrg,Yrg,vrg,Lzred,\[ScriptCapitalQ]1,\[ScriptCapitalQ]2},
+	EEg=EEgfun[a,p,e,x];
+	Lzg=Lzgfun[a,p,e,x];
+	KKg=(Lzg-a EEg)^2;
+	
+	r1g=p/(1-e);
+	r2g=p/(1+e);
+	r3g=2/(1-EEg^2)-(r1g+r2g);
+	
+	rg=rgICr1gfuneq[wr,a,p,e,x];
+	\[CapitalDelta]rg=(a^2-2rg+rg^2);
+	Rrg=(-a*Lzg+EEg(a^2+rg^2));
+	Yrg=Sqrt[(1-EEg^2)(rg-r3g)rg];
+	
+	vrg=Sign[Pi-Mod[wr,2Pi]]Sqrt[(r1g-rg)(rg-r2g)]Yrg;
+	Lzred=Lzg-a EEg;
+	\[ScriptCapitalQ]1=a^2Lzred*rg^2+rg^3(rg-2)Lzred+KKg(Lzg rg^2-2rg*Lzred);
+	\[ScriptCapitalQ]2=2a*rg(KKg+rg^2)Lzred-(rg^2+a^2)rg^2(EEg KKg+a*Lzred);
+	
+	-2\[ScriptCapitalQ]1 (a(Rrg(a^2+2rg^2+rg^2)))/(Sqrt[KKg]\[CapitalDelta]rg^2rg^5(KKg+rg^2))-2\[ScriptCapitalQ]2 (Rrg(rg^2+a^2))/(Sqrt[KKg]\[CapitalDelta]rg^2rg^5(KKg+rg^2))-vrg^2(2(rg^2-a^2)KKg)/(Sqrt[KKg]\[CapitalDelta]rg^2rg^3(KKg+rg^2))
+]
+
+
 (* ::Subsubsection::Closed:: *)
 (*\[CapitalGamma]^t_{23}*)
 
@@ -1465,6 +1652,29 @@ d\[Phi]zgd\[Lambda][wz_,coeff_]:=Module[{dim},
 	\[ScriptCapitalQ]2=2 a rg(KKg+rg^2)Lzred-(rg^2+a^2)rg^2(EEg KKg+a Lzred);
 	
 	-2\[ScriptCapitalQ]1 ( Rrg((rg^2+a^2)+rg (rg-rg^2)))/(Sqrt[KKg]\[CapitalDelta]rg^2rg^5(KKg+rg^2))-2\[ScriptCapitalQ]2 (a Rrg)/(Sqrt[KKg]\[CapitalDelta]rg^2rg^5(KKg+rg^2))-vrg^2 (2a (rg-1)KKg)/(Sqrt[KKg]\[CapitalDelta]rg^2rg^3(KKg+rg^2))
+]
+
+
+\[CapitalGamma]\[Phi]12ICr1gfuneq[wr_,a_,p_,e_,x_]:=Module[{EEg,Lzg,KKg,r1g,r2g,r3g,\[Chi]r,rg,\[CapitalDelta]rg,Rrg,Yrg,vrg,Lzred,\[ScriptCapitalQ]1,\[ScriptCapitalQ]2},
+	EEg=EEgfun[a,p,e,x];
+	Lzg=Lzgfun[a,p,e,x];
+	KKg=(Lzg-a EEg)^2;
+
+	r1g=p/(1-e);
+	r2g=p/(1+e);
+	r3g=2/(1-EEg^2)-(r1g+r2g);
+	
+	rg=rgICr1gfuneq[wr,a,p,e,x];
+	\[CapitalDelta]rg=(a^2-2rg+rg^2);
+	Rrg=(-a*Lzg+EEg(a^2+rg^2));
+	Yrg=Sqrt[(1-EEg^2)(rg-r3g)rg];
+	
+	vrg=Sign[Pi-Mod[wr,2Pi]]Sqrt[(r1g-rg)(rg-r2g)]Yrg;
+	Lzred=Lzg-a EEg;
+	\[ScriptCapitalQ]1=a^2Lzred rg^2+rg^3(rg-2)Lzred+KKg(Lzg rg^2-2rg Lzred);
+	\[ScriptCapitalQ]2=2 a rg(KKg+rg^2)Lzred-(rg^2+a^2)rg^2(EEg KKg+a Lzred);
+	
+	-2\[ScriptCapitalQ]1 (Rrg((rg^2+a^2)+rg(rg-rg^2)))/(Sqrt[KKg]\[CapitalDelta]rg^2rg^5(KKg+rg^2))-2\[ScriptCapitalQ]2 (a*Rrg)/(Sqrt[KKg]\[CapitalDelta]rg^2rg^5(KKg+rg^2))-vrg^2(2a(rg-1)KKg)/(Sqrt[KKg]\[CapitalDelta]rg^2rg^3(KKg+rg^2))
 ]
 
 
@@ -1846,6 +2056,67 @@ z1savgFC[a_,p_,e_,xg_]:=Module[{r1g,r2g,z1g,EEg,Lzg,KKg,r3g,r4g,z2g,krg,\[Capita
 	
 	-{dEgdr1g r1savgsub+dEgdr2g r2savgsub+dEgdz1g z1savgsub,dLzgdr1g r1savgsub+dLzgdr2g r2savgsub+dLzgdz1g z1savgsub,dKgdr1g r1savgsub+dKgdr2g r2savgsub+dKgdz1g z1savgsub}
 ]
+
+
+(* ::Subsubsection::Closed:: *)
+(*Equatorial plane*)
+
+
+\[Delta]EEfunDHeq[a_,p_,e_,x_]:=Module[{EEg,Lzg,r1g,r2g},
+	EEg=EEgfuneq[a,p,e,x];
+	Lzg=Lzgfuneq[a,p,e,x];
+	r1g=p/(1-e);
+	r2g=p/(1+e);
+
+	((a*EEg-Lzg)(EEg*Lzg*r1g^2*r2g^2+2a^3*EEg^2(r1g+r2g)+a^2EEg*Lzg(r1g^2+r1g(-4+r2g)+(-4+r2g)r2g)-a*Lzg^2(r1g^2+r1g(-2+r2g)+(-2+r2g)r2g)))/(r1g^2*r2g^2(2(a*EEg-Lzg)(a^2*EEg-a*Lzg+EEg*r1g^2)+EEg(2a*EEg+Lzg(-2+r1g))r1g*r2g+EEg(2a*EEg+Lzg(-2+r1g))r2g^2))
+]
+
+
+\[Delta]LzfunDHeq[a_,p_,e_,x_]:=Module[{EEg,Lzg,r1g,r2g},
+	EEg=EEgfuneq[a,p,e,x];
+	Lzg=Lzgfuneq[a,p,e,x];
+	r1g=p/(1-e);
+	r2g=p/(1+e);
+
+	(a (-a*EEg+Lzg)^2*r1g(-2a*Lzg+EEg*r1g^3+a^2*EEg(2+r1g))+a (-a*EEg+Lzg)^2(-2a*Lzg+EEg*r1g^3+a^2*EEg(2+r1g))r2g+EEg(a*EEg-Lzg)(a^2+3 r1g^2)(a^2 EEg-a Lzg+EEg r1g^2)r2g^2+EEg*r1g(a (-a*EEg+Lzg)^2+3EEg(a*EEg-Lzg)r1g^2+EEg*Lzg*r1g^3)r2g^3+EEg(a (-a*EEg+Lzg)^2+3EEg(a*EEg-Lzg)r1g^2+EEg*Lzg*r1g^3)r2g^4)/(r1g^2*r2g^2(2(a*EEg-Lzg)(a^2*EEg-a*Lzg+EEg*r1g^2)+EEg(2a*EEg+Lzg(-2+r1g))r1g*r2g+EEg(2a*EEg+Lzg(-2+r1g))r2g^2))
+]
+
+
+(* ::Subsection::Closed:: *)
+(*Shifts constants of motion, fixed eccentricity *)
+
+
+\[Delta]r3funeq[a_,p_,e_,x_]:=Module[{EEg,Lzg,\[Delta]EE},
+	EEg=EEgfuneq[a,p,e,x];
+	Lzg=Lzgfuneq[a,p,e,x];
+	\[Delta]EE=\[Delta]EEfunDHeq[a,p,e,x];
+
+	-((a^3(1-EEg^2)+a*Lzg^2)/(2(-a*EEg+Lzg)^2))+(4EEg*\[Delta]EE)/(1-EEg^2)^2
+]
+
+
+\[Delta]r41funeq[a_,p_,e_,x_]:=Module[{EEg,Lzg},
+	EEg=EEgfuneq[a,p,e,x];
+	Lzg=Lzgfuneq[a,p,e,x];
+
+	-((a^3(1-EEg^2)+a*Lzg^2)/(4(-a*EEg+Lzg)^2))
+]
+
+
+\[Delta]pfuneq[a_,p_,e_,x_]:=Module[{EEg,dEdp,\[Delta]EE,\[Delta]\[Rho]r4},
+	EEg=EEgfuneq[a,p,e,x];
+	dEdp= dEEdpfuneq[a,p,e,x];
+	\[Delta]EE=\[Delta]EEfunDHeq[a,p,e,x];
+	\[Delta]\[Rho]r4=\[Delta]r41funeq[a,p,e,x];
+
+	(2(-1+e^2)(-2EEg*\[Delta]EE+(1-EEg^2)^2*\[Delta]\[Rho]r4))/(-4dEdp*EEg+4dEdp*e^2*EEg+3(1-EEg^2)^2-e (1-EEg^2)^2)
+]
+
+
+\[Delta]r1funFEeq[a_,p_,e_,x_]:=\[Delta]pfuneq[a,p,e,x]/(1-e)
+
+
+\[Delta]r2funFEeq[a_,p_,e_,x_]:=\[Delta]pfuneq[a,p,e,x]/(1+e)
 
 
 (* ::Section::Closed:: *)
@@ -3358,6 +3629,13 @@ freqdev\[Phi][a_,p_,e_,xg_]:=Module[{sgn,\[CapitalUpsilon]rg,\[CapitalUpsilon]zg
 ];
 
 
+\[Xi]rpareq[wr_,coeff_]:=Module[{dim},
+	dim=(Length[coeff]-1)/2;
+
+	-Sum[2Sin[n*wr]coeff[[n+dim+1]]/(n),{n,1,dim}]
+];
+
+
 (* ::Subsubsection::Closed:: *)
 (*Fixed constants of motion*)
 
@@ -3468,6 +3746,54 @@ freqdev\[Phi][a_,p_,e_,xg_]:=Module[{sgn,\[CapitalUpsilon]rg,\[CapitalUpsilon]zg
 	wzlist=Table[wz,{wz,2Pi/(stepsz)/2,2Pi,2Pi/(stepsz)}];
 	
 	Chop[(ExpniTable . (Table[\[Delta]YroverYrgsparDH[wrlist[[i]],wzlist,a,p,e,xg,const,\[Delta]const],{i,stepsr}]) . ExpjkTable)/(stepsr*stepsz),10^(-16)]
+]
+
+
+(* ::Subsubsection::Closed:: *)
+(*Physical and continuous gauge*)
+
+
+\[Delta]YroverYrgsparFEeq[wr_,a_,p_,e_,x_]:=Module[{EEg,Lzg,KKg,\[Delta]EE,\[Delta]Lz,\[Delta]KK,r1g,r2g,r3g,rg,zg,Yrg,\[CapitalDelta],Rrg,r1spar,r2spar,dVrgdEg,dVrgdLzg,dVrgdKg,fraux2,fraux0,fraux,fauxdC},
+	EEg=EEgfun[a,p,e,x];
+	Lzg=Lzgfun[a,p,e,x];
+	KKg=(Lzg-a EEg)^2;
+	\[Delta]EE=\[Delta]EEfunDHeq[a,p,e,x]+dEEdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x];
+	\[Delta]Lz=\[Delta]LzfunDHeq[a,p,e,x]+dLzdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x];
+	\[Delta]KK=2(Lzg-a EEg)(\[Delta]Lz-a \[Delta]EE);
+
+	r1g=p/(1-e);
+	r2g=p/(1+e);
+	r3g=2/(1-EEg^2)-(r1g+r2g);
+
+	rg=rgICr1gfuneq[wr,a,p,e,x];
+
+	Yrg=Sqrt[(1-EEg^2)(rg-r3g)rg];
+	\[CapitalDelta]=(a^2-2rg+rg^2);
+	Rrg=(a^2*EEg-a*Lzg+EEg*rg^2);
+
+	r1spar=\[Delta]pfuneq[a,p,e,x]/(1-e);
+	r2spar=\[Delta]pfuneq[a,p,e,x]/(1+e);
+
+	dVrgdEg=2(rg^2+a^2)Rrg;
+	dVrgdLzg=-2a*Rrg;
+	dVrgdKg=-\[CapitalDelta];
+
+	fraux2=Yrg/Sqrt[KKg] (EEg-(2 EEg KKg)/(KKg+rg^2)-(2 rg^2Rrg)/rg^4+Rrg/rg^2);
+	fraux0=(Sqrt[KKg]*\[CapitalDelta]*Rrg)/((KKg+rg^2)(-rg+r1g)(rg-r2g)Yrg)+(a*\[CapitalDelta]*RealSign[Lzg-a EEg])/((-rg+r1g)(rg-r2g)Yrg)+(rg*Rrg(KKg(-1+rg)+a(a-2a*EEg^2+2EEg*Lzg)rg+rg^2(-3+2(1-EEg^2)rg))KKg)/(Sqrt[KKg]rg^2*(KKg+rg^2)(rg-r1g)(rg-r2g)Yrg)-(r1spar-r2spar+(r1spar+r2spar)Sin\[Chi]rICr1gfuneq[wr,a,p,e,x])((r1g-r2g)Yrg)/(4(r1g-rg)(rg-r2g));
+	fraux=((r1spar+r2spar)/2+(r1spar-r2spar)/2*Sin\[Chi]rICr1gfuneq[wr,a,p,e,x])((1-EEg^2)(2 rg-r3g))/(2Yrg);
+	fauxdC=(\[Delta]EE*dVrgdEg+\[Delta]Lz*dVrgdLzg+\[Delta]KK*dVrgdKg)/(2(-rg+r1g) (rg-r2g) Yrg);
+
+	1/Yrg(fraux0+fraux2+fraux+fauxdC)
+]
+
+
+\[Delta]YroverYrgsparFEcoeffeq[nmax_,a_,p_,e_,x_]:=Module[{stepsr,wrlist,ExpniTable},
+	stepsr=4*nmax;
+	ExpniTable=Table[N[Exp[-2Pi*I*n*(i-1/2)/stepsr],Precision[{a,p,e,x}]],{n,-nmax,nmax},{i,1,stepsr}];
+
+	wrlist=Table[wr,{wr,2Pi/(stepsr)/2,2Pi,2Pi/(stepsr)}];
+
+	Chop[(ExpniTable . \[Delta]YroverYrgsparFEeq[wrlist,a,p,e,x]) /(stepsr),10^-16]
 ]
 
 
@@ -4027,6 +4353,22 @@ dvspard\[Lambda]Fourier[wr_,wz_,coeff_]:=Module[{dimr,dimz},
 ]
 
 
+(* ::Subsubsection::Closed:: *)
+(*fixed eccentricity*)
+
+
+\[Delta]rsparFEfuneq[wr_,a_,p_,e_,x_,coeff_]:=Module[{EEg,Lzg,r1spar,r2spar,rspar},
+	EEg=EEgfuneq[a,p,e,x];
+	Lzg=Lzgfuneq[a,p,e,x];
+
+	r1spar=\[Delta]pfuneq[a,p,e,x]/(1-e);
+	r2spar=\[Delta]pfuneq[a,p,e,x]/(1+e);
+
+	rspar=1/2(r1spar+r2spar)+1/2(r1spar-r2spar)Sin\[Chi]rICr1gfuneq[wr,a,p,e,x];
+	rspar-drgdwrICr1gfuneq[wr,a,p,e,x]Re[\[Xi]rpareq[wr,coeff]]
+]
+
+
 (* ::Subsection::Closed:: *)
 (*Radial and polar velocities *)
 
@@ -4151,6 +4493,40 @@ dzsparDHd\[Lambda]fun[wr_,wz_,a_,p_,e_,xg_,const_,\[Delta]const_,coeff_]:=Module
 ]
 
 
+(* ::Subsubsection::Closed:: *)
+(*fixed eccentricity*)
+
+
+drsparFEd\[Lambda]funeq[wr_,a_,p_,e_,x_,coeff_]:=Module[{EEg,Lzg,KKg,\[Delta]EE,\[Delta]Lz,\[Delta]KK,r1g,r2g,r3g,\[Chi]r,r1spar,r2spar,rg,rspar,\[CapitalDelta]rg,Rrg,Yrg,dVrgdrg,dVrgdEg,dVrgdLzg,dVrgdKg},
+	EEg=EEgfuneq[a,p,e,x];
+	Lzg=Lzgfuneq[a,p,e,x];
+	KKg=(Lzg-a EEg)^2;
+	\[Delta]EE=\[Delta]EEfunDHeq[a,p,e,x]+dEEdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x];
+	\[Delta]Lz=\[Delta]LzfunDHeq[a,p,e,x]+dLzdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x];
+	\[Delta]KK=2(Lzg-a EEg)(\[Delta]Lz-a \[Delta]EE);
+
+	r1g=p/(1-e);
+	r2g=p/(1+e);
+	r3g=2/(1-EEg^2)-(r1g+r2g);
+
+	r1spar=\[Delta]pfuneq[a,p,e,x]/(1-e);
+	r2spar=\[Delta]pfuneq[a,p,e,x]/(1+e);
+
+	rg=rgICr1gfuneq[wr,a,p,e,x];
+	rspar=1/2(r1spar+r2spar)+1/2(r1spar-r2spar)Sin\[Chi]rICr1gfuneq[wr,a,p,e,x];
+
+	\[CapitalDelta]rg=(a^2-2rg+rg^2);
+	Rrg=(-a*Lzg+EEg(a^2+rg^2));
+	Yrg=Sqrt[(1-EEg^2)(rg-r3g)rg];
+	dVrgdrg=2(1-rg)(KKg+rg^2)-2rg*\[CapitalDelta]rg+4EEg*rg*Rrg;
+	dVrgdEg=2(rg^2+a^2)Rrg;
+	dVrgdLzg=-2a*Rrg;
+	dVrgdKg=-\[CapitalDelta]rg;
+
+	1/(Sign[\[Pi]-Mod[wr,2 \[Pi]]]Sqrt[(r1g-rg)(rg-r2g)]Yrg) (\[CapitalDelta]rg^2*\[ScriptCapitalS]12rICr1gfuneq[wr,a,p,e,x]+a \[CapitalDelta]rg RealSign[Lzg-a EEg]+\[CapitalDelta]rg Sqrt[KKg] Rrg/(KKg+rg^2)+1/2 rspar dVrgdrg+1/2 (\[Delta]EE dVrgdEg +\[Delta]Lz dVrgdLzg+\[Delta]KK dVrgdKg))-(drgdwrICr1gfuneq[wr,a,p,e,x]dVrgdrg)/(2Sign[\[Pi]-Mod[wr,2 \[Pi]]]Sqrt[(r1g-rg)(rg-r2g)]Yrg) Re[\[Xi]rpareq[wr,coeff]]
+]
+
+
 (* ::Subsection::Closed:: *)
 (*Coordinate time velocity*)
 
@@ -4226,6 +4602,39 @@ dtsparDHd\[Lambda]coefffun[nmax_,kmax_,a_,p_,e_,xg_,const_,\[Delta]const_,coeffr
 	]
 
 
+(* ::Subsubsection::Closed:: *)
+(*fixed eccentricity*)
+
+
+dtsparFEd\[Lambda]funeq[wr_,a_,p_,e_,x_,coeffrad_]:=Module[{EEg,Lzg,\[Delta]EE,\[Delta]Lz,rg,\[CapitalDelta]rg,Rrg,dVtrgdrg,dVtrgdEg,dVtrgdLzg,dVtzgdEg},
+	EEg=EEgfuneq[a,p,e,x];
+	Lzg=Lzgfuneq[a,p,e,x];
+	\[Delta]EE=\[Delta]EEfunDHeq[a,p,e,x]+dEEdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x];
+	\[Delta]Lz=\[Delta]LzfunDHeq[a,p,e,x]+dLzdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x];
+	rg=rgICr1gfuneq[wr,a,p,e,x];
+
+	\[CapitalDelta]rg=(a^2-2rg+rg^2);
+	Rrg=(a^2EEg-a*Lzg+EEg rg^2);
+
+	dVtrgdrg=(2a*Lzg(rg^2-a^2))/\[CapitalDelta]rg^2+(4EEg*rg(a^2+rg^2))/\[CapitalDelta]rg-(2EEg(rg-1)(a^2+rg^2)^2)/\[CapitalDelta]rg^2;
+	dVtrgdEg=(a^2+rg^2)^2/\[CapitalDelta]rg;
+	dVtrgdLzg=-((2a*rg)/\[CapitalDelta]rg);
+	dVtzgdEg=-a^2 ;
+
+	dVtrgdrg*\[Delta]rsparFEfuneq[wr,a,p,e,x,coeffrad]+(\[Delta]EE*dVtrgdEg+\[Delta]Lz*dVtrgdLzg)+(\[Delta]EE*dVtzgdEg)-rg^2/2*\[CapitalGamma]t12ICr1gfuneq[wr,a,p,e,x]
+]
+
+
+dtsparFEd\[Lambda]coefffuneq[nmax_,a_,p_,e_,x_,coeffrad_]:=Module[{stepsr,wrlist,ExpniTable},
+	stepsr=4*nmax;
+	ExpniTable=Table[N[Exp[2Pi*I*n*(i-1/2)/stepsr],Precision[{a,p,e,x}]],{n,-nmax,nmax},{i,1,stepsr}];
+
+	wrlist=Table[wr,{wr,2Pi/(stepsr)/2,2Pi,2Pi/(stepsr)}];
+
+	Chop[(ExpniTable . dtsparFEd\[Lambda]funeq[wrlist,a,p,e,x,coeffrad])/(stepsr),10^-16]
+]
+
+
 (* ::Subsection::Closed:: *)
 (*Azimuthal velocity*)
 
@@ -4299,6 +4708,38 @@ d\[Phi]sparDHd\[Lambda]coefffun[nmax_,kmax_,a_,p_,e_,xg_,const_,\[Delta]const_,c
 ]
 
 
+(* ::Subsubsection::Closed:: *)
+(*fixed eccentricity*)
+
+
+d\[Phi]sparFEd\[Lambda]funeq[wr_,a_,p_,e_,x_,coeffrad_]:=Module[{EEg,Lzg,\[Delta]EE,\[Delta]Lz,rg,\[CapitalDelta]rg,dV\[Phi]rgdrg,dV\[Phi]rgdEg,dV\[Phi]rgdLzg},
+	EEg=EEgfuneq[a,p,e,x];
+	Lzg=Lzgfuneq[a,p,e,x];
+	\[Delta]EE=\[Delta]EEfunDHeq[a,p,e,x]+dEEdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x];
+	\[Delta]Lz=\[Delta]LzfunDHeq[a,p,e,x]+dLzdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x];
+
+	rg=rgICr1gfuneq[wr,a,p,e,x];
+
+	\[CapitalDelta]rg=(a^2-2rg+rg^2);
+
+	dV\[Phi]rgdrg=(2a*EEg*rg)/\[CapitalDelta]rg-(2a(rg-1)(-a*Lzg+EEg(a^2+rg^2)))/\[CapitalDelta]rg^2;
+	dV\[Phi]rgdEg=(2a*rg)/\[CapitalDelta]rg;
+	dV\[Phi]rgdLzg=-(a^2/\[CapitalDelta]rg);
+
+	dV\[Phi]rgdrg*\[Delta]rsparFEfuneq[wr,a,p,e,x,coeffrad]+(\[Delta]EE*dV\[Phi]rgdEg+\[Delta]Lz*dV\[Phi]rgdLzg)+\[Delta]Lz-rg^2/2*\[CapitalGamma]\[Phi]12ICr1gfuneq[wr,a,p,e,x]
+]
+
+
+d\[Phi]sparFEd\[Lambda]coefffuneq[nmax_,a_,p_,e_,x_,coeffrad_]:=Module[{stepsr,wrlist,ExpniTable},
+	stepsr=4*nmax;
+	ExpniTable=Table[N[Exp[2Pi*I*n*(i-1/2)/stepsr],Precision[{a,p,e,x}]],{n,-nmax,nmax},{i,1,stepsr}];
+
+	wrlist=Table[wr,{wr,2Pi/(stepsr)/2,2Pi,2Pi/(stepsr)}];
+
+	Chop[(ExpniTable . d\[Phi]sparFEd\[Lambda]funeq[wrlist,a,p,e,x,coeffrad])/(stepsr),10^-16]
+]
+
+
 (* ::Subsection::Closed:: *)
 (*Coordinate time and azimuthal trajectories*)
 
@@ -4312,6 +4753,13 @@ d\[Phi]sparDHd\[Lambda]coefffun[nmax_,kmax_,a_,p_,e_,xg_,const_,\[Delta]const_,c
 	dimz=(Dimensions[\[Delta]coeff][[2]]-1)/2;
 	
 	2Sum[Sin[n wr+k wz]\[Delta]coeff[[n+dimr+1,k+dimz+1]]/(n*\[CapitalUpsilon]rg+k*\[CapitalUpsilon]zg),{n,1,dimr},{k,1,dimz}]+2Sum[Sin[n wr+k wz]\[Delta]coeff[[n+dimr+1,k+dimz+1]]/(n*\[CapitalUpsilon]rg+k*\[CapitalUpsilon]zg),{n,1,dimr},{k,-dimz,-1}]+2Sum[Sin[n wr]\[Delta]coeff[[n+dimr+1,dimz+1]]/(n*\[CapitalUpsilon]rg),{n,1,dimr}]+2Sum[Sin[k wz]\[Delta]coeff[[dimr+1,k+dimz+1]]/(k*\[CapitalUpsilon]zg),{k,1,dimz}]-2(\[CapitalUpsilon]rs/\[CapitalUpsilon]rg^2)Sum[Sin[n wr]coeffVtr[[n+dimr+1]]/n,{n,1,dimr}]-2(\[CapitalUpsilon]zs/\[CapitalUpsilon]zg^2)Sum[Sin[k wz]coeffVtz[[k+dimz+1]]/k,{k,1,dimz}]
+]
+
+
+\[CapitalDelta]spareq[wr_,\[CapitalUpsilon]rg_,\[CapitalUpsilon]rs_,\[Delta]coeff_,coeffVtr_]:=Module[{dimr},
+	dimr=(Length[\[Delta]coeff]-1)/2;
+
+	Sum[2Sin[n*wr]\[Delta]coeff[[n+dimr+1]]/(n*\[CapitalUpsilon]rg),{n,1,dimr}]-\[CapitalUpsilon]rs*Sum[2Sin[n*wr]coeffVtr[[n+dimr+1]]/(n*\[CapitalUpsilon]rg^2),{n,1,dimr}]
 ]
 
 
@@ -5055,6 +5503,10 @@ KerrSpinOrbitCorrectionFCPar[a_, p_, e_, x_, nmax_?(IntegerQ[#] && # > 0&), kmax
 	\[CapitalUpsilon]rg=\[CapitalUpsilon]rgfun[a,p,e,x];
 	\[CapitalUpsilon]zg=\[CapitalUpsilon]zgfun[a,p,e,x];
 	\[CapitalUpsilon]\[Phi]g=\[CapitalUpsilon]\[Phi]grfun[a,p,e,x]+\[CapitalUpsilon]\[Phi]gzfun[a,p,e,x];
+	
+	(* spin correction constants of motion *)
+	{\[Delta]EEg,\[Delta]Lzg,\[Delta]KKg}=\[Delta]constmotionfun[a,p,e,x];
+	\[Delta]constmot={\[Delta]EEg,\[Delta]Lzg,\[Delta]KKg};
 	  
 	(* steps for numerical integration *)
 	stepsr=4*nmax;
@@ -5106,6 +5558,9 @@ KerrSpinOrbitCorrectionFCPar[a_, p_, e_, x_, nmax_?(IntegerQ[#] && # > 0&), kmax
 	 "Eg"->EEg,
 	 "Lzg"->Lzg,
 	 "Kg"->KKg,
+	 "Es"->\[Delta]EEg,
+	 "Jzs"->\[Delta]Lzg,
+	 "Ks"->\[Delta]KKg,
 	 "MinoFrequenciesGeo"->{\[CapitalUpsilon]tg,\[CapitalUpsilon]rg,\[CapitalUpsilon]zg,\[CapitalUpsilon]\[Phi]g},
 	 "BLFrequenciesGeo"->{\[CapitalUpsilon]rg/\[CapitalUpsilon]tg,\[CapitalUpsilon]zg/\[CapitalUpsilon]tg,\[CapitalUpsilon]\[Phi]g/\[CapitalUpsilon]tg},
 	 "MinoFrequenciesCorrection"->{\[CapitalUpsilon]ts,\[CapitalUpsilon]rs,\[CapitalUpsilon]zs,\[CapitalUpsilon]\[Phi]s},
@@ -5573,6 +6028,92 @@ KerrSpinOrbitCorrectionOrt[a_, p_, e_, x_, nmax_?(IntegerQ[#] && # > 0&), kmax_?
 	 "\[Delta]v\[Phi]ort"->Function[{wr,wz,wp},d\[Phi]sortd\[Lambda][wr,wz,wp]],
 	 "\[Delta]v\[Phi]ortplus"->Function[{wr,wz},d\[Phi]sortplusd\[Lambda][wr,wz]],
 	 "\[Delta]v\[Phi]ortminus"->Function[{wr,wz},d\[Phi]sortminusd\[Lambda][wr,wz]]
+	|>
+]
+
+
+(* ::Section::Closed:: *)
+(*Eccentric, equatorial orbits - parallel component of the spin*)
+
+
+(* ::Subsection::Closed:: *)
+(*Fixed eccentricity*)
+
+
+KerrSpinOrbitCorrectionFEParEq[a_, p_, e_, x_, nmax_?(IntegerQ[#] && # > 0&)]:=Module[{EEg,Lzg,KKg,constmot,\[CapitalUpsilon]tg,\[CapitalUpsilon]rg,\[CapitalUpsilon]\[Phi]g,\[Delta]EE,\[Delta]Lz,\[Delta]KK,\[Delta]constmot,\[CapitalUpsilon]ts,\[CapitalUpsilon]rs,\[CapitalUpsilon]\[Phi]s,stepsr,\[CapitalDelta]tspar,\[CapitalDelta]\[Phi]spar,\[Delta]rpar,
+	ExpniTable,\[Xi]rparcoeffeq,dtrgd\[Lambda]coeffeq,d\[Phi]rgd\[Lambda]coeffeq,wrlist,dtspard\[Lambda]coeffeq,d\[Phi]spard\[Lambda]coeffeq,\[CapitalDelta]trg,\[CapitalDelta]\[Phi]rg,dtspard\[Lambda],drspard\[Lambda],d\[Phi]spard\[Lambda]},
+	(* geodesic constants of motion *)
+	EEg=EEgfuneq[a,p,e,x];
+	Lzg=Lzgfuneq[a,p,e,x];
+	KKg=(Lzg-a EEg)^2;
+	constmot={EEg,Lzg,KKg};
+	
+	(* geodesic frequencies *)
+	\[CapitalUpsilon]tg=\[CapitalUpsilon]tgrfun[a,p,e,x]+\[CapitalUpsilon]tgzfun[a,p,e,x];
+	\[CapitalUpsilon]rg=\[CapitalUpsilon]rgfun[a,p,e,x];
+	\[CapitalUpsilon]\[Phi]g=\[CapitalUpsilon]\[Phi]grfun[a,p,e,x]+\[CapitalUpsilon]\[Phi]gzfun[a,p,e,x];
+	
+	(* spin correction constants of motion *)
+	\[Delta]EE=\[Delta]EEfunDHeq[a,p,e,x]+dEEdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x];
+	\[Delta]Lz=\[Delta]LzfunDHeq[a,p,e,x]+dLzdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x];
+	\[Delta]constmot={\[Delta]EE,\[Delta]Lz};
+	  
+	(* steps for numerical integration *)
+	stepsr=4*nmax;
+	(* matrices of discrete Fourier transform *)
+	ExpniTable=Table[N[Exp[2Pi*I*n*(i-1/2)/stepsr],Precision[{a,p,e,x}]],{n,-nmax,nmax},{i,1,stepsr}];
+	
+	wrlist=Table[wr,{wr,2Pi/(stepsr)/2,2Pi,2Pi/(stepsr)}];
+  
+	(* Fourier coeffients geodesic functions *)
+	dtrgd\[Lambda]coeffeq=VtrgcoeffICr1geq[nmax,a,p,e,x];	
+	d\[Phi]rgd\[Lambda]coeffeq=V\[Phi]rgcoeffICr1geq[nmax,a,p,e,x];
+	
+	Print["Calculating \!\(\*SubscriptBox[\(\[Xi]\), \(r\)]\) Fourier coefficients"];
+	\[Xi]rparcoeffeq=\[Delta]YroverYrgsparFEcoeffeq[nmax,a,p,e,x];
+	
+	(* spin correction radial and polar frequencies *)
+	\[CapitalUpsilon]rs=\[CapitalUpsilon]rg*\[Xi]rparcoeffeq[[nmax+1]];
+	Print["Calculating Fourier coefficients of \!\(\*SubscriptBox[\(dt\), \(s\)]\)/d\[Lambda]"];
+	dtspard\[Lambda]coeffeq=dtsparFEd\[Lambda]coefffuneq[nmax,a,p,e,x,\[Xi]rparcoeffeq];
+	\[CapitalUpsilon]ts=dtspard\[Lambda]coeffeq[[nmax+1]];
+	Print["Calculating Fourier coefficients of \!\(\*SubscriptBox[\(d\[Phi]\), \(s\)]\)/d\[Lambda]"];
+	d\[Phi]spard\[Lambda]coeffeq=d\[Phi]sparFEd\[Lambda]coefffuneq[nmax,a,p,e,x,\[Xi]rparcoeffeq];
+	\[CapitalUpsilon]\[Phi]s=d\[Phi]spard\[Lambda]coeffeq[[nmax+1]];
+	
+	\[CapitalDelta]trg[wr_]:=\[CapitalDelta]trgfun[wr,dtrgd\[Lambda]coeffeq,\[CapitalUpsilon]rg];
+	\[CapitalDelta]\[Phi]rg[wr_]:=\[CapitalDelta]\[Phi]rgfun[wr,d\[Phi]rgd\[Lambda]coeffeq,\[CapitalUpsilon]rg];
+	
+	\[CapitalDelta]tspar[wr_]:=\[CapitalDelta]spareq[wr,\[CapitalUpsilon]rg,\[CapitalUpsilon]rs,dtspard\[Lambda]coeffeq,dtrgd\[Lambda]coeffeq];
+	\[CapitalDelta]\[Phi]spar[wr_]:=\[CapitalDelta]spareq[wr,\[CapitalUpsilon]rg,\[CapitalUpsilon]rs,d\[Phi]spard\[Lambda]coeffeq,d\[Phi]rgd\[Lambda]coeffeq];
+	\[Delta]rpar[wr_]:=\[Delta]rsparFEfuneq[wr,a,p,e,x,\[Xi]rparcoeffeq];
+	
+	dtspard\[Lambda][wr_]:=dtsparFEd\[Lambda]funeq[wr,a,p,e,x,\[Xi]rparcoeffeq];
+	d\[Phi]spard\[Lambda][wr_]:=d\[Phi]sparFEd\[Lambda]funeq[wr,a,p,e,x,\[Xi]rparcoeffeq];
+	drspard\[Lambda][wr_]:=drsparFEd\[Lambda]funeq[wr,a,p,e,x,\[Xi]rparcoeffeq];
+			
+	<|
+	 "OrbitalElements"->{a,p,e,x},
+	 "Eg"->EEg,
+	 "Lzg"->Lzg,
+	 "Kg"->KKg,
+	 "Es"->\[Delta]EE,
+	 "Jzs"->\[Delta]Lz,
+	 "MinoFrequenciesGeo"->{\[CapitalUpsilon]tg,\[CapitalUpsilon]rg,\[CapitalUpsilon]\[Phi]g},
+	 "BLFrequenciesGeo"->{\[CapitalUpsilon]rg/\[CapitalUpsilon]tg,\[CapitalUpsilon]\[Phi]g/\[CapitalUpsilon]tg},
+	 "MinoFrequenciesCorrection"->{\[CapitalUpsilon]ts,\[CapitalUpsilon]rs,\[CapitalUpsilon]\[Phi]s},
+	 "BLFrequenciesCorrection"->{\[CapitalUpsilon]rs/\[CapitalUpsilon]tg-\[CapitalUpsilon]rg/\[CapitalUpsilon]tg^2*\[CapitalUpsilon]ts,\[CapitalUpsilon]\[Phi]s/\[CapitalUpsilon]tg-\[CapitalUpsilon]\[Phi]g/\[CapitalUpsilon]tg^2*\[CapitalUpsilon]ts},
+	 (*Keys purely oscillatory part geodesic coordinate time and azimuthal trajectories*)
+	 "\[CapitalDelta]trg"->Function[{wr},\[CapitalDelta]trg[wr]],
+	 "\[CapitalDelta]\[Phi]rg"->Function[{wr},\[CapitalDelta]\[Phi]rg[wr]],
+	 (*Keys corrections trajectories*)
+	 "\[CapitalDelta]\[Delta]tpar"->Function[{wr},\[CapitalDelta]tspar[wr]],
+	 "\[Delta]rpar"->Function[{wr},\[Delta]rpar[wr]],
+	 "\[CapitalDelta]\[Delta]\[Phi]par"->Function[{wr},\[CapitalDelta]\[Phi]spar[wr]],
+	 (*Keys corrections velocities*)
+	 "\[Delta]vtpar"->Function[{wr},dtspard\[Lambda][wr]],
+	 "\[Delta]vrpar"->Function[{wr},drspard\[Lambda][wr]],
+	 "\[Delta]v\[Phi]par"->Function[{wr},d\[Phi]spard\[Lambda][wr]]
 	|>
 ]
 
