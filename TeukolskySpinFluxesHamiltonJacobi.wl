@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* ::Section:: *)
+(* ::Section::Closed:: *)
 (*Begin package*)
 
 
@@ -14,7 +14,7 @@ BeginPackage["TeukolskySpinFluxes`",
 
 (* ::Text:: *)
 (*If you make use of this package, please acknowledge *)
-(*- "Piovano, Pantelidou, Mac Uilliam and Witzany" arXiv:2410.05769 (https://arxiv.org/abs/2410.05769v1 ) *)
+(*- "Piovano, Pantelidou, Mac Uilliam and Witzany" PRD 111, 044009 (https://journals.aps.org/prd/abstract/10.1103/PhysRevD.111.044009 )*)
 (*- "Piovano, Brito, Maselli, Pani" PRD 104, 124019 (https://journals.aps.org/prd/abstract/10.1103/PhysRevD.104.124019 )*)
 (* - "Skoup\[YAcute], Lukes-Gerakopoulos, Drummond, Hughes" PRD 108, 044041 (https://journals.aps.org/prd/abstract/10.1103/PhysRevD.108.044041 )*)
 (**)
@@ -31,7 +31,7 @@ BeginPackage["TeukolskySpinFluxes`",
 
 
 (* ::Text:: *)
-(*uses the solutions of the spin-corrections to the orbits computed with the Hamilton-Jacobi formalism. See arXiv:2410.05769 (https://arxiv.org/abs/2410.05769v1 ). The source term and the algorithm for computing the amplitudes and fluxes are mostly unchanged from the code of PRD 108, 044041, with the following exceptions:*)
+(*uses the solutions of the spin-corrections to the orbits computed with the Hamilton-Jacobi formalism. See PRD 111, 044009 (https://journals.aps.org/prd/abstract/10.1103/PhysRevD.111.044009 ). The source term and the algorithm for computing the amplitudes and fluxes are mostly unchanged from the code of PRD 108, 044041, with the following exceptions:*)
 (*- this version of code returns the fully linearize spin-corrections to the amplitudes and fluxes. It does NOT use finite difference methods (see Eq. 66 of PRD 108, 044041)*)
 (*- we performed some tweaks to the original code to improve its performance (for instance, we exploit the vectorization of functions in Mathematica to speed up some calculations).*)
 
@@ -60,16 +60,16 @@ BeginPackage["TeukolskySpinFluxes`",
 (*mod_SpinWeightedSpheroidalHarmonics2 was developed in PRD 104, 124019, and it is a modified version of the SpinWeightedSpheroidalHarmonics package, version 0.3.0 (https://zenodo.org/records/8091168 ) of the  BHPToolkit (https://bhptoolkit.org/ ).  See the notebook Amplitudes_and_fluxes_corrections _v3 .nb on how to load the package mod_SpinWeightedSpheroidalHarmonics2. To load it properly, make sure that mod_SpinWeightedSpheroidalHarmonics2 has the same version number or higher compare to the vanilla SpinWeightedSpheroidalHarmonics package. The version can be checked in PacletInfo.wl contain inside the folder "mod_SpinWeightedSpheroidalHarmonics2". To update the version of the mod_SpinWeightedSpheroidalHarmonics2 , open PacletInfo.wl , increase the number in "Version", then run the command PacletDataRebuild[]*)
 
 
-TeukolskySpinModeCorrectionDH::usage = "TeukolskySpinModeCorrectionDH[l,m,n,k,orbitCorrection] calculates linear correction to the fluxes and amplitudes in the fixed turning points (on average) parametrization";
+TeukolskySpinModeCorrectionDH::usage = "TeukolskySpinModeCorrectionDH[l,m,n,k,orbitCorrection] calculates the linear correction to the fluxes and amplitudes in the fixed turning points (on average) parametrization.";
 
 
-TeukolskySpinModeCorrectionFC::usage = "TeukolskySpinModeCorrectionFC[l,m,n,k,orbitCorrection] calculates linear correction to the fluxes and amplitudes in the fixed constants of motion parametrization";
+TeukolskySpinModeCorrectionFC::usage = "TeukolskySpinModeCorrectionFC[l,m,n,k,orbitCorrection] calculates the linear correction to the fluxes and amplitudes in the fixed constants of motion parametrization.";
 
 
-TeukolskySpinModeCorrectionOrtPlus::usage = "TeukolskySpinModeCorrectionOrtPlus[l,m,n,k,orbitCorrection] calculates the corrections to amplitudes due to the orthogonal component of the secondary spin for the +1 precession mode";
+TeukolskySpinModeCorrectionOrtPlus::usage = "TeukolskySpinModeCorrectionOrtPlus[l,m,n,k,orbitCorrection] calculates the corrections to amplitudes due to the orthogonal component of the secondary spin for the +1 precession mode.";
 
 
-TeukolskySpinModeCorrectionOrtMinus::usage = "TeukolskySpinModeCorrectionOrtMinus[l,m,n,k,orbitCorrection] calculates the corrections to amplitudes due to the orthogonal component of the secondary spin for the -1 precession mode";
+TeukolskySpinModeCorrectionOrtMinus::usage = "TeukolskySpinModeCorrectionOrtMinus[l,m,n,k,orbitCorrection] calculates the corrections to amplitudes due to the orthogonal component of the secondary spin for the -1 precession mode.";
 
 
 Begin["`Private`"];

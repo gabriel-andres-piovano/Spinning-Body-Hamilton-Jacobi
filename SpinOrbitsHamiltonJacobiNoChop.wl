@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-(* ::Section::Closed:: *)
+(* ::Section:: *)
 (*Begin package*)
 
 
@@ -8,7 +8,7 @@ BeginPackage["SpinningOrbit`"];
 
 
 (* ::Text:: *)
-(*If you make use of this package, please acknowledge "Piovano, Pantelidou, Mac Uilliam and Witzany" arXiv:2410.05769 (https://arxiv.org/abs/2410.05769v1 )*)
+(*If you make use of this package, please acknowledge "Piovano, Pantelidou, Mac Uilliam and Witzany" PRD 111, 044009 (https://journals.aps.org/prd/abstract/10.1103/PhysRevD.111.044009 )*)
 
 
 (* ::Text:: *)
@@ -23,16 +23,16 @@ BeginPackage["SpinningOrbit`"];
 (*PREREQUISITEs: none. The package is stand-alone.*)
 
 
-KerrSpinOrbitCorrectionDHPar::usage = "KerrSpinOrbitCorrectionDHPar[a, p, e, x, nmax, kmax] calculates linear corrections to the orbits in the fixed turning points on average parametrization for the parallel component of the spin";
+KerrSpinOrbitCorrectionDHPar::usage = "KerrSpinOrbitCorrectionDHPar[a, p, e, x, nmax, kmax] calculates the linear corrections to the orbits in the fixed turning points on average parametrization for the parallel component of the spin.";
 
 
-KerrSpinOrbitCorrectionFCPar::usage = "KerrSpinOrbitCorrectionFCPar[a, p, e, x, nmax, kmax] calculates linear corrections to the orbits in the fixed constants of motion parametrization for the parallel component of the spin";
+KerrSpinOrbitCorrectionFCPar::usage = "KerrSpinOrbitCorrectionFCPar[a, p, e, x, nmax, kmax] calculates the linear corrections to the orbits in the fixed constants of motion parametrization for the parallel component of the spin.";
 
 
-KerrSpinOrbitCorrectionDHMapFC::usage = "KerrSpinOrbitCorrectionDHMapFC[a, p, e, x, nmax, kmax] calculates the map between the fixed turning points and fixed constants of motion parametrization ";
+KerrSpinOrbitCorrectionDHMapFC::usage = "KerrSpinOrbitCorrectionDHMapFC[a, p, e, x, nmax, kmax] calculates the the map between the fixed turning points and fixed constants of motion parametrization.";
 
 
-KerrSpinOrbitCorrectionOrt::usage = "KerrSpinOrbitCorrectionOrt[a, p, e, x, nmax, kmax] calculates linear corrections to the orbits for the orthogonal component of the spin ";
+KerrSpinOrbitCorrectionOrt::usage = "KerrSpinOrbitCorrectionOrt[a, p, e, x, nmax, kmax] calculates the linear corrections to the orbits for the orthogonal component of the spin.";
 
 
 Begin["`Private`"];
