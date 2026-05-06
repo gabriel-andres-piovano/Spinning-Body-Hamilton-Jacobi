@@ -390,7 +390,7 @@ bchorHS0spin[workingprecision_,s_,m_,a_,\[Omega]0_,\[Lambda]0_]:=Module[{M=1,del
 		n==1,
 		(2 I a m+2 M (-1+s)-2 I a^2 \[Omega]0+rp (2+\[Lambda]0-4 I rp s \[Omega]0))/((rm-rp) rp),
 		n>1,
-		2 (-1+n) (-rp)^(-n)+(rm-rp)^(-n)(2+\[Lambda]0-4 I rm s \[Omega]0)+1/rp 2 n (rm-rp)^-n (M (-1+s)+I a (m-a \[Omega]0)) Hypergeometric2F1[1,1-n,2,rm/rp]
+		2 (-1+n) (-rp)^(-n)+(rm-rp)^(-n)(2+\[Lambda]0-4 I rm s \[Omega]0)+1/rp 2 n (rm-rp)^-n (M (-1+s)+I a (m-a \[Omega]0))(1+(1/n)*Sum[Binomial[n,k] (-rm)^(k-1)/rp^(k-1),{k,2,n}])
 	];
 		
 	dphor0[n_]:=Which[
@@ -519,7 +519,7 @@ bchorHS1spin[workingprecision_,s_,m_,a_,\[Omega]0_,\[Omega]1_,\[Lambda]0_,\[Lamb
 		n==1,
 		(2 I a m+2 M (-1+s)-2 I a^2 \[Omega]0+rp (2+\[Lambda]0-4 I rp s \[Omega]0))/((rm-rp) rp),
 		n>1,
-		2 (-1+n) (-rp)^(-n)+(rm-rp)^(-n)(2+\[Lambda]0-4 I rm s \[Omega]0)+1/rp 2 n (rm-rp)^-n (M (-1+s)+I a (m-a \[Omega]0)) Hypergeometric2F1[1,1-n,2,rm/rp]
+		2 (-1+n) (-rp)^(-n)+(rm-rp)^(-n)(2+\[Lambda]0-4 I rm s \[Omega]0)+1/rp 2 n (rm-rp)^-n (M (-1+s)+I a (m-a \[Omega]0))(1+(1/n)*Sum[Binomial[n,k] (-rm)^(k-1)/rp^(k-1),{k,2,n}])
 	];
 	
 	dqhor1[n_]:=Which[
@@ -927,6 +927,10 @@ dfabid\[Theta][\[Zeta]_,\[Zeta]bar_,sin\[Theta]_,\[CapitalDelta]_,d\[CapitalDelt
 (*Generic - fixed turning points*)
 
 
+(* ::Text:: *)
+(*The sign of the amplitudes now follow the same convention of the BHPToolkit (the sign convention was changed after the first version of this code).*)
+
+
 TeukolskySpinModeCorrectionDH[l_,m_,n_,k_,orbitCorrection_]:=Module[{a,p,e,x,h1,h2,h3,\[ScriptCapitalI],En,Lz,Kc,En1,Lz1,\[CapitalOmega]r,\[CapitalOmega]\[Theta],\[CapitalOmega]\[Phi],\[CapitalOmega]r1,\[CapitalOmega]\[Theta]1,\[CapitalOmega]\[Phi]1,rg,zg,\[CapitalGamma],\[CapitalGamma]1,\[Omega],\[Omega]1,
     SWSH,SWSHS,R,\[Lambda],\[Lambda]1,\[ScriptCapitalC]2,\[ScriptCapitalC]21,rplus,P,\[Epsilon],\[Alpha],\[Alpha]1,W,W1,sumPlus0,sumMinus0,sumPlus1,sumMinus1,stepsr,steps\[Theta],\[Theta]list,
     lists,ir,i\[Theta],wrsub,w\[Theta],rp,zp,sin\[Theta]p,Ur,Uz,expr,expr1,exp\[Theta],exp\[Theta]1,\[CapitalDelta],d\[CapitalDelta],K,K1,dK,dK1,V,V1,dV,RInrp,dRInrp,ddRInrp,RInrp1,dRInrp1,ddRInrp1,dddRInrp,
@@ -1169,13 +1173,13 @@ TeukolskySpinModeCorrectionDH[l_,m_,n_,k_,orbitCorrection_]:=Module[{a,p,e,x,h1,
     "\[Omega]s"->\[Omega]1,
     "Amplitudes"->
     <|
-      "\[ScriptCapitalI]"->CPlus0,
-      "\[ScriptCapitalH]"->CMinus0
+      "\[ScriptCapitalI]"->-CPlus0,
+      "\[ScriptCapitalH]"->-CMinus0
     |>,
     "AmplitudesCorrection"->
     <|
-      "\[ScriptCapitalI]"->CPlus1,
-      "\[ScriptCapitalH]"->CMinus1
+      "\[ScriptCapitalI]"->-CPlus1,
+      "\[ScriptCapitalH]"->-CMinus1
     |>,
     "Fluxes"->
     <|
@@ -1209,6 +1213,10 @@ TeukolskySpinModeCorrectionDH[l_,m_,n_,k_,orbitCorrection_]:=Module[{a,p,e,x,h1,
 
 (* ::Subsection::Closed:: *)
 (*Generic - fixed constants of motion*)
+
+
+(* ::Text:: *)
+(*The sign of the amplitudes now follow the same convention of the BHPToolkit (the sign convention was changed after the first version of this code).*)
 
 
 TeukolskySpinModeCorrectionFC[l_,m_,n_,k_,orbitCorrection_]:=Module[{a,p,e,x,h1,h2,h3,\[ScriptCapitalI],En,Lz,Kc,En1,Lz1,\[CapitalOmega]r,\[CapitalOmega]\[Theta],\[CapitalOmega]\[Phi],\[CapitalOmega]r1,\[CapitalOmega]\[Theta]1,\[CapitalOmega]\[Phi]1,rg,zg,\[CapitalGamma],\[CapitalGamma]1,\[Omega],\[Omega]1,
@@ -1451,13 +1459,13 @@ TeukolskySpinModeCorrectionFC[l_,m_,n_,k_,orbitCorrection_]:=Module[{a,p,e,x,h1,
     "\[Omega]s"->\[Omega]1,
     "Amplitudes"->
     <|
-      "\[ScriptCapitalI]"->CPlus0,
-      "\[ScriptCapitalH]"->CMinus0
+      "\[ScriptCapitalI]"->-CPlus0,
+      "\[ScriptCapitalH]"->-CMinus0
     |>,
     "AmplitudesCorrection"->
     <|
-      "\[ScriptCapitalI]"->CPlus1,
-      "\[ScriptCapitalH]"->CMinus1
+      "\[ScriptCapitalI]"->-CPlus1,
+      "\[ScriptCapitalH]"->-CMinus1
     |>,
     "Fluxes"->
     <|
@@ -1723,8 +1731,8 @@ For[ir = 1, ir <= stepsr, ir++,(* integration over w_r *)
     "\[Omega]g"->\[Omega],
     "AmplitudesCorrection"->
     <|
-      "\[ScriptCapitalI]"->CPlus1,
-      "\[ScriptCapitalH]"->CMinus1
+      "\[ScriptCapitalI]"->-CPlus1,
+      "\[ScriptCapitalH]"->-CMinus1
     |>,
     "stepsr"->stepsr,
     "steps\[Theta]"->steps\[Theta]
@@ -1963,8 +1971,8 @@ If[stepsr<=steps\[Theta],
     "\[Omega]g"->\[Omega],
     "AmplitudesCorrection"->
     <|
-      "\[ScriptCapitalI]"->CPlus1,
-      "\[ScriptCapitalH]"->CMinus1
+      "\[ScriptCapitalI]"->-CPlus1,
+      "\[ScriptCapitalH]"->-CMinus1
     |>,
     "stepsr"->stepsr,
     "steps\[Theta]"->steps\[Theta]
