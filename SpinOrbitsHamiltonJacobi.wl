@@ -3750,15 +3750,15 @@ freqdev\[Phi][a_,p_,e_,xg_]:=Module[{sgn,\[CapitalUpsilon]rg,\[CapitalUpsilon]zg
 
 
 (* ::Subsubsection::Closed:: *)
-(*Physical and continuous gauge*)
+(*Fixed eccentricity*)
 
 
 \[Delta]YroverYrgsparFEeq[wr_,a_,p_,e_,x_]:=Module[{EEg,Lzg,KKg,\[Delta]EE,\[Delta]Lz,\[Delta]KK,r1g,r2g,r3g,rg,zg,Yrg,\[CapitalDelta],Rrg,r1spar,r2spar,dVrgdEg,dVrgdLzg,dVrgdKg,fraux2,fraux0,fraux,fauxdC},
 	EEg=EEgfun[a,p,e,x];
 	Lzg=Lzgfun[a,p,e,x];
 	KKg=(Lzg-a EEg)^2;
-	\[Delta]EE=\[Delta]EEfunDHeq[a,p,e,x]+dEEdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x];
-	\[Delta]Lz=\[Delta]LzfunDHeq[a,p,e,x]+dLzdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x];
+	\[Delta]EE=RealSign[x](\[Delta]EEfunDHeq[a,p,e,x]+dEEdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x]);
+	\[Delta]Lz=RealSign[x](\[Delta]LzfunDHeq[a,p,e,x]+dLzdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x]);
 	\[Delta]KK=2(Lzg-a EEg)(\[Delta]Lz-a \[Delta]EE);
 
 	r1g=p/(1-e);
@@ -3771,8 +3771,8 @@ freqdev\[Phi][a_,p_,e_,xg_]:=Module[{sgn,\[CapitalUpsilon]rg,\[CapitalUpsilon]zg
 	\[CapitalDelta]=(a^2-2rg+rg^2);
 	Rrg=(a^2*EEg-a*Lzg+EEg*rg^2);
 
-	r1spar=\[Delta]pfuneq[a,p,e,x]/(1-e);
-	r2spar=\[Delta]pfuneq[a,p,e,x]/(1+e);
+	r1spar=RealSign[x]*\[Delta]pfuneq[a,p,e,x]/(1-e);
+	r2spar=RealSign[x]*\[Delta]pfuneq[a,p,e,x]/(1+e);
 
 	dVrgdEg=2(rg^2+a^2)Rrg;
 	dVrgdLzg=-2a*Rrg;
@@ -3798,7 +3798,7 @@ freqdev\[Phi][a_,p_,e_,xg_]:=Module[{sgn,\[CapitalUpsilon]rg,\[CapitalUpsilon]zg
 
 
 (* ::Subsection::Closed:: *)
-(*Functions for \[Xi]r - parallel component of the spin*)
+(*Functions for \[Xi]z - parallel component of the spin*)
 
 
 \[Xi]zpar[wr_,wz_,\[CapitalUpsilon]rg_,\[CapitalUpsilon]zg_,coeff_]:=Module[{dimr,dimz},
@@ -4354,15 +4354,15 @@ dvspard\[Lambda]Fourier[wr_,wz_,coeff_]:=Module[{dimr,dimz},
 
 
 (* ::Subsubsection::Closed:: *)
-(*fixed eccentricity*)
+(*Fixed eccentricity*)
 
 
 \[Delta]rsparFEfuneq[wr_,a_,p_,e_,x_,coeff_]:=Module[{EEg,Lzg,r1spar,r2spar,rspar},
 	EEg=EEgfuneq[a,p,e,x];
 	Lzg=Lzgfuneq[a,p,e,x];
 
-	r1spar=\[Delta]pfuneq[a,p,e,x]/(1-e);
-	r2spar=\[Delta]pfuneq[a,p,e,x]/(1+e);
+	r1spar=RealSign[x]*\[Delta]pfuneq[a,p,e,x]/(1-e);
+	r2spar=RealSign[x]*\[Delta]pfuneq[a,p,e,x]/(1+e);
 
 	rspar=1/2(r1spar+r2spar)+1/2(r1spar-r2spar)Sin\[Chi]rICr1gfuneq[wr,a,p,e,x];
 	rspar-drgdwrICr1gfuneq[wr,a,p,e,x]Re[\[Xi]rpareq[wr,coeff]]
@@ -4494,23 +4494,23 @@ dzsparDHd\[Lambda]fun[wr_,wz_,a_,p_,e_,xg_,const_,\[Delta]const_,coeff_]:=Module
 
 
 (* ::Subsubsection::Closed:: *)
-(*fixed eccentricity*)
+(*Fixed eccentricity*)
 
 
 drsparFEd\[Lambda]funeq[wr_,a_,p_,e_,x_,coeff_]:=Module[{EEg,Lzg,KKg,\[Delta]EE,\[Delta]Lz,\[Delta]KK,r1g,r2g,r3g,\[Chi]r,r1spar,r2spar,rg,rspar,\[CapitalDelta]rg,Rrg,Yrg,dVrgdrg,dVrgdEg,dVrgdLzg,dVrgdKg},
 	EEg=EEgfuneq[a,p,e,x];
 	Lzg=Lzgfuneq[a,p,e,x];
 	KKg=(Lzg-a EEg)^2;
-	\[Delta]EE=\[Delta]EEfunDHeq[a,p,e,x]+dEEdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x];
-	\[Delta]Lz=\[Delta]LzfunDHeq[a,p,e,x]+dLzdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x];
+	\[Delta]EE=RealSign[x]*(\[Delta]EEfunDHeq[a,p,e,x]+dEEdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x]);
+	\[Delta]Lz=RealSign[x]*(\[Delta]LzfunDHeq[a,p,e,x]+dLzdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x]);
 	\[Delta]KK=2(Lzg-a EEg)(\[Delta]Lz-a \[Delta]EE);
 
 	r1g=p/(1-e);
 	r2g=p/(1+e);
 	r3g=2/(1-EEg^2)-(r1g+r2g);
 
-	r1spar=\[Delta]pfuneq[a,p,e,x]/(1-e);
-	r2spar=\[Delta]pfuneq[a,p,e,x]/(1+e);
+	r1spar=RealSign[x]*\[Delta]pfuneq[a,p,e,x]/(1-e);
+	r2spar=RealSign[x]*\[Delta]pfuneq[a,p,e,x]/(1+e);
 
 	rg=rgICr1gfuneq[wr,a,p,e,x];
 	rspar=1/2(r1spar+r2spar)+1/2(r1spar-r2spar)Sin\[Chi]rICr1gfuneq[wr,a,p,e,x];
@@ -4603,14 +4603,14 @@ dtsparDHd\[Lambda]coefffun[nmax_,kmax_,a_,p_,e_,xg_,const_,\[Delta]const_,coeffr
 
 
 (* ::Subsubsection::Closed:: *)
-(*fixed eccentricity*)
+(*Fixed eccentricity*)
 
 
 dtsparFEd\[Lambda]funeq[wr_,a_,p_,e_,x_,coeffrad_]:=Module[{EEg,Lzg,\[Delta]EE,\[Delta]Lz,rg,\[CapitalDelta]rg,Rrg,dVtrgdrg,dVtrgdEg,dVtrgdLzg,dVtzgdEg},
 	EEg=EEgfuneq[a,p,e,x];
 	Lzg=Lzgfuneq[a,p,e,x];
-	\[Delta]EE=\[Delta]EEfunDHeq[a,p,e,x]+dEEdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x];
-	\[Delta]Lz=\[Delta]LzfunDHeq[a,p,e,x]+dLzdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x];
+	\[Delta]EE=RealSign[x]*(\[Delta]EEfunDHeq[a,p,e,x]+dEEdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x]);
+	\[Delta]Lz=RealSign[x]*(\[Delta]LzfunDHeq[a,p,e,x]+dLzdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x]);
 	rg=rgICr1gfuneq[wr,a,p,e,x];
 
 	\[CapitalDelta]rg=(a^2-2rg+rg^2);
@@ -4709,14 +4709,14 @@ d\[Phi]sparDHd\[Lambda]coefffun[nmax_,kmax_,a_,p_,e_,xg_,const_,\[Delta]const_,c
 
 
 (* ::Subsubsection::Closed:: *)
-(*fixed eccentricity*)
+(*Fixed eccentricity*)
 
 
 d\[Phi]sparFEd\[Lambda]funeq[wr_,a_,p_,e_,x_,coeffrad_]:=Module[{EEg,Lzg,\[Delta]EE,\[Delta]Lz,rg,\[CapitalDelta]rg,dV\[Phi]rgdrg,dV\[Phi]rgdEg,dV\[Phi]rgdLzg},
 	EEg=EEgfuneq[a,p,e,x];
 	Lzg=Lzgfuneq[a,p,e,x];
-	\[Delta]EE=\[Delta]EEfunDHeq[a,p,e,x]+dEEdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x];
-	\[Delta]Lz=\[Delta]LzfunDHeq[a,p,e,x]+dLzdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x];
+	\[Delta]EE=RealSign[x]*(\[Delta]EEfunDHeq[a,p,e,x]+dEEdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x]);
+	\[Delta]Lz=RealSign[x]*(\[Delta]LzfunDHeq[a,p,e,x]+dLzdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x]);
 
 	rg=rgICr1gfuneq[wr,a,p,e,x];
 
@@ -6054,8 +6054,8 @@ KerrSpinOrbitCorrectionFEParEq[a_, p_, e_, x_, nmax_?(IntegerQ[#] && # > 0&)]:=M
 	\[CapitalUpsilon]\[Phi]g=\[CapitalUpsilon]\[Phi]grfun[a,p,e,x]+\[CapitalUpsilon]\[Phi]gzfun[a,p,e,x];
 	
 	(* spin correction constants of motion *)
-	\[Delta]EE=\[Delta]EEfunDHeq[a,p,e,x]+dEEdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x];
-	\[Delta]Lz=\[Delta]LzfunDHeq[a,p,e,x]+dLzdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x];
+	\[Delta]EE=RealSign[x]*(\[Delta]EEfunDHeq[a,p,e,x]+dEEdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x]);
+	\[Delta]Lz=RealSign[x]*(\[Delta]LzfunDHeq[a,p,e,x]+dLzdpfuneq[a,p,e,x]\[Delta]pfuneq[a,p,e,x]);
 	\[Delta]constmot={\[Delta]EE,\[Delta]Lz};
 	  
 	(* steps for numerical integration *)
